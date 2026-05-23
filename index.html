@@ -194,6 +194,8 @@ textarea.form-control{resize:vertical;min-height:72px}
     <div class="nav-item" data-page="products" onclick="nav(this)"><span class="ni">💊</span> Sản phẩm</div>
     <div class="nav-item" data-page="inventory" onclick="nav(this)"><span class="ni">📦</span> Kho hàng</div>
     <div class="nav-item" data-page="kpi" onclick="nav(this)"><span class="ni">🎯</span> KPI Sales</div>
+    <div class="nav-sec">Doanh nghiệp</div>
+    <div class="nav-item" data-page="company" onclick="nav(this)"><span class="ni">🏢</span> Công ty</div>
   </nav>
 </aside>
 <main class="main" id="main">
@@ -218,6 +220,7 @@ textarea.form-control{resize:vertical;min-height:72px}
   <div id="debt" class="page"></div>
   <div id="regions" class="page"></div>
   <div id="kpi" class="page"></div>
+  <div id="company" class="page"></div>
 </main>
 
 <!-- Customer Modal -->
@@ -350,10 +353,64 @@ textarea.form-control{resize:vertical;min-height:72px}
 
 <script>
 const SK='medcrm_v3';
-let DB={customers:[],products:[],quotes:[],orders:[],inventory:[],followups:[],payments:[]};
+let DB={customers:[],products:[],quotes:[],orders:[],inventory:[],followups:[],payments:[],company:null};
 
 function save(){localStorage.setItem(SK,JSON.stringify(DB));badges();}
-function load(){try{const d=localStorage.getItem(SK);if(d)DB=JSON.parse(d);}catch(e){}if(!DB.customers||!DB.customers.length)seed();}
+function load(){
+  try{const d=localStorage.getItem(SK);if(d)DB=JSON.parse(d);}catch(e){}
+  if(!DB.customers||!DB.customers.length)seed();
+  if(!DB.company)DB.company=seedCompany();
+}
+
+function seedCompany(){
+  return {
+    name:'Công ty TNHH Vật Tư Y Tế',
+    shortName:'Anh Sáng Y Tế',
+    founded:'2010',
+    tagline:'Đồng hành cùng sức khỏe cộng đồng',
+    vision:'Trở thành đơn vị phân phối vật tư y tế hàng đầu miền Nam — uy tín, tốc độ và chuyên nghiệp. Đến năm 2030, mở rộng ra toàn quốc với doanh thu vượt 50 tỷ/năm.',
+    mission:'Cung cấp vật tư y tế chất lượng cao, đúng sản phẩm, đúng giá, giao đúng hẹn — giúp các cơ sở y tế hoạt động hiệu quả, an toàn và tiết kiệm chi phí.',
+    values:[
+      {icon:'⚡',title:'Tốc độ',desc:'Phản hồi trong 2 giờ. Giao hàng đúng lịch. Không để khách hàng chờ lâu khi cần vật tư gấp.'},
+      {icon:'💰',title:'Giá cạnh tranh',desc:'Luôn báo giá tốt nhất thị trường. Chiết khấu minh bạch, không phụ phí ẩn.'},
+      {icon:'🤝',title:'Quan hệ bền vững',desc:'Xây dựng niềm tin lâu dài với từng khách hàng. Biết tên, biết nhu cầu, biết mùa vụ mua hàng của họ.'},
+      {icon:'📦',title:'Đa dạng sản phẩm',desc:'Một đầu mối cho tất cả nhu cầu vật tư y tế — từ kim tiêm đến kit xét nghiệm đến thiết bị chuyên dụng.'},
+    ],
+    rules:[
+      'Phản hồi khách hàng trong vòng 2 giờ làm việc — dù chưa có câu trả lời cũng phải xác nhận đã nhận được yêu cầu',
+      'Cập nhật CRM ngay sau mỗi cuộc gọi, gặp mặt hoặc gửi báo giá — không để cuối ngày mới nhập',
+      'Không hứa ngày giao hàng khi chưa kiểm tra tồn kho thực tế',
+      'Báo cáo vấn đề kho hàng, hết hàng hoặc hàng lỗi ngay trong ngày phát hiện',
+      'Không cạnh tranh nội bộ — chia sẻ khách hàng tiềm năng với đồng nghiệp khi phù hợp',
+      'Giữ bí mật thông tin giá, chiết khấu và danh sách khách hàng — đây là tài sản công ty',
+    ],
+    strategy:{
+      overview:'Tập trung chiếm lĩnh thị trường miền Nam (TP.HCM + 5 tỉnh lân cận) trong 2026, sau đó mở rộng ra miền Trung từ 2027.',
+      targets:['Bệnh viện công tuyến tỉnh/huyện (đấu thầu)','Phòng khám tư nhân cao cấp','Chuỗi nhà thuốc (Long Châu, An Khang, Pharmacity)','Phòng xét nghiệm độc lập'],
+      products:'Ưu tiên vật tư tiêu hao (doanh thu ổn định, lặp lại) + Kit xét nghiệm (tăng trưởng mạnh) + Thiết bị y tế (giá trị đơn lớn, xây uy tín).',
+      competitive:'Cạnh tranh bằng: (1) Giao hàng nhanh nhất khu vực, (2) Giá tốt + chiết khấu linh hoạt, (3) Chăm sóc cá nhân hóa từng khách hàng, (4) Danh mục đủ rộng để là một đầu mối duy nhất.',
+      revenueTarget:'Trên 15 tỷ/năm 2026',
+    },
+    okrs:[
+      {id:'ok1',obj:'Tăng trưởng doanh thu vượt 15 tỷ/năm',quarter:'2026',krs:[
+        {kr:'Đạt doanh thu ≥ 1.25 tỷ/tháng (trung bình)',progress:60},
+        {kr:'Thêm 20 khách hàng BV/PK mới trong năm',progress:35},
+        {kr:'Tỉ lệ chốt báo giá ≥ 65%',progress:50},
+      ]},
+      {id:'ok2',obj:'Nâng cao chất lượng vận hành',quarter:'2026',krs:[
+        {kr:'Giao hàng đúng hẹn ≥ 95% đơn hàng',progress:88},
+        {kr:'Tồn kho 0 đơn bị hoãn vì thiếu hàng chủ lực',progress:75},
+        {kr:'Công nợ quá 60 ngày < 10% tổng dư nợ',progress:65},
+      ]},
+      {id:'ok3',obj:'Phát triển đội ngũ',quarter:'2026',krs:[
+        {kr:'100% nhân viên sales dùng CRM hàng ngày',progress:80},
+        {kr:'Mỗi sales có ≥ 15 KH active trong pipeline',progress:55},
+        {kr:'Không có nhân viên chủ chốt nghỉ việc trong năm',progress:100},
+      ]},
+    ],
+    updatedAt:new Date().toISOString().slice(0,10),
+  };
+}
 
 function seed(){
   const d=n=>{const x=new Date();x.setDate(x.getDate()+n);return x.toISOString().slice(0,10);};
@@ -511,8 +568,8 @@ function toggleSB(){
 function closeSB(){sbOn=false;document.getElementById('sidebar').classList.remove('open');document.getElementById('overlay').classList.remove('on');}
 
 // ── Nav ──
-const PM={dashboard:{t:'Dashboard',s:''},customers:{t:'Danh sách khách hàng',s:'CRM'},regions:{t:'Khách hàng theo khu vực',s:'Phân bố địa lý'},products:{t:'Sản phẩm & Vật tư',s:'Danh mục'},quotes:{t:'Báo giá',s:''},orders:{t:'Đơn hàng',s:''},inventory:{t:'Kho hàng',s:'Nhập / Xuất / Tồn'},followup:{t:'Follow-up',s:'Lịch liên hệ'},debt:{t:'Công nợ',s:'Thanh toán'},kpi:{t:'KPI Nhân viên Sales',s:'Hiệu suất bán hàng'}};
-const PFN={dashboard:rDash,customers:rCust,regions:rRegions,products:rProd,quotes:rQuotes,orders:rOrders,inventory:rInv,followup:rFU,debt:rDebt,kpi:rKPI};
+const PM={dashboard:{t:'Dashboard',s:''},customers:{t:'Danh sách khách hàng',s:'CRM'},regions:{t:'Khách hàng theo khu vực',s:'Phân bố địa lý'},products:{t:'Sản phẩm & Vật tư',s:'Danh mục'},quotes:{t:'Báo giá',s:''},orders:{t:'Đơn hàng',s:''},inventory:{t:'Kho hàng',s:'Nhập / Xuất / Tồn'},followup:{t:'Follow-up',s:'Lịch liên hệ'},debt:{t:'Công nợ',s:'Thanh toán'},kpi:{t:'KPI Nhân viên Sales',s:'Hiệu suất bán hàng'},company:{t:'Hồ sơ Công ty',s:'Tầm nhìn · Chiến lược · Văn hóa'}};
+const PFN={dashboard:rDash,customers:rCust,regions:rRegions,products:rProd,quotes:rQuotes,orders:rOrders,inventory:rInv,followup:rFU,debt:rDebt,kpi:rKPI,company:rCompany};
 
 function nav(el){
   const p=el.dataset.page;
@@ -1002,6 +1059,258 @@ function rRegions(){
     <div class="stat-card"><div class="stat-icon">📊</div><div class="stat-label">KH lớn nhất vùng</div><div class="stat-value" style="font-size:14px">${allRegions.reduce((m,r)=>{const n=DB.customers.filter(c=>(c.region||'TP. Hồ Chí Minh')===r).length;return n>m.n?{n,r}:m;},{n:0,r:'—'}).r}</div><div class="stat-delta">theo số KH</div></div>
   </div>
   ${cards}`;
+}
+
+// ═══════ COMPANY PAGE ═══════
+function rCompany(){
+  const co=DB.company;
+  document.getElementById('pg-actions').innerHTML=`<button class="btn btn-primary" onclick="editCompanySection('overview')">✏️ Chỉnh sửa</button>`;
+
+  // OKR section
+  const okrHTML=co.okrs.map(o=>{
+    const avgProg=Math.round(o.krs.reduce((s,k)=>s+k.progress,0)/o.krs.length);
+    const krsHTML=o.krs.map((k,ki)=>`
+      <div style="margin-bottom:10px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+          <span style="font-size:13px;color:var(--text)">${esc(k.kr)}</span>
+          <span style="font-size:12px;font-weight:700;color:${k.progress>=80?'var(--green)':k.progress>=50?'var(--amber)':'var(--red)'};">${k.progress}%</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <div class="prog" style="flex:1"><div class="prog-fill" style="width:${k.progress}%;background:${k.progress>=80?'var(--green)':k.progress>=50?'var(--amber)':'var(--red)'}"></div></div>
+          <button class="btn-icon btn-sm" onclick="editOKRProgress('${o.id}',${ki})" title="Cập nhật tiến độ" style="font-size:11px;padding:3px 6px">📝</button>
+        </div>
+      </div>`).join('');
+    return`<div class="card" style="margin-bottom:14px">
+      <div class="card-header">
+        <div>
+          <div class="card-title">🎯 ${esc(o.obj)}</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:2px">${esc(o.quarter)} · Tiến độ trung bình: <strong style="color:${avgProg>=70?'var(--green)':'var(--amber)'}">${avgProg}%</strong></div>
+        </div>
+        <button class="btn btn-sm btn-ghost" onclick="editOKR('${o.id}')">✏️</button>
+      </div>
+      <div style="padding:16px">${krsHTML}</div>
+    </div>`;
+  }).join('');
+
+  // Values section
+  const valuesHTML=co.values.map(v=>`
+    <div style="background:var(--primary-light);border:1px solid var(--primary-border);border-radius:12px;padding:16px 18px;display:flex;gap:14px;align-items:flex-start">
+      <div style="font-size:28px;line-height:1;flex-shrink:0">${v.icon}</div>
+      <div>
+        <div style="font-weight:700;font-size:14px;color:var(--primary-darker);margin-bottom:4px">${esc(v.title)}</div>
+        <div style="font-size:13px;color:var(--text);line-height:1.6">${esc(v.desc)}</div>
+      </div>
+    </div>`).join('');
+
+  // Rules section
+  const rulesHTML=co.rules.map((r,i)=>`
+    <div style="display:flex;gap:12px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--border)">
+      <div style="width:24px;height:24px;border-radius:50%;background:var(--primary);color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0">${i+1}</div>
+      <div style="font-size:13px;color:var(--text);line-height:1.6;padding-top:2px">${esc(r)}</div>
+    </div>`).join('');
+
+  // Strategy targets
+  const targetHTML=co.strategy.targets.map(t=>`<div style="display:flex;gap:8px;align-items:center;margin-bottom:6px"><span style="color:var(--primary);font-size:14px">▸</span><span style="font-size:13px">${esc(t)}</span></div>`).join('');
+
+  document.getElementById('company').innerHTML=`
+  <!-- Hero banner -->
+  <div style="background:linear-gradient(135deg,var(--primary) 0%,var(--primary-darker) 100%);border-radius:16px;padding:28px 32px;color:#fff;margin-bottom:22px;position:relative;overflow:hidden">
+    <div style="position:absolute;right:-20px;top:-20px;font-size:120px;opacity:.08;line-height:1">🏥</div>
+    <div style="font-size:11px;font-weight:600;letter-spacing:1px;opacity:.75;margin-bottom:6px">CÔNG TY</div>
+    <div style="font-size:26px;font-weight:700;margin-bottom:4px">${esc(co.name)}</div>
+    <div style="font-size:14px;opacity:.85;margin-bottom:16px">${esc(co.tagline)} · Thành lập ${esc(co.founded)}</div>
+    <div style="display:flex;gap:24px;flex-wrap:wrap">
+      <div><div style="font-size:11px;opacity:.7;margin-bottom:2px">MỤC TIÊU 2026</div><div style="font-size:16px;font-weight:700">${esc(co.strategy.revenueTarget)}</div></div>
+      <div><div style="font-size:11px;opacity:.7;margin-bottom:2px">KHÁCH HÀNG</div><div style="font-size:16px;font-weight:700">${DB.customers.length} cơ sở y tế</div></div>
+      <div><div style="font-size:11px;opacity:.7;margin-bottom:2px">SẢN PHẨM</div><div style="font-size:16px;font-weight:700">${DB.products.length} mặt hàng</div></div>
+      <div><div style="font-size:11px;opacity:.7;margin-bottom:2px">CẬP NHẬT</div><div style="font-size:16px;font-weight:700">${fmtD(co.updatedAt)}</div></div>
+    </div>
+  </div>
+
+  <!-- Vision & Mission -->
+  <div class="grid-2" style="margin-bottom:18px">
+    <div class="card">
+      <div class="card-header"><div class="card-title">🌟 Tầm nhìn</div><button class="btn btn-sm btn-ghost" onclick="editCompanySection('vision')">✏️</button></div>
+      <div style="padding:18px;font-size:14px;line-height:1.8;color:var(--text)">${esc(co.vision)}</div>
+    </div>
+    <div class="card">
+      <div class="card-header"><div class="card-title">🎯 Sứ mệnh</div><button class="btn btn-sm btn-ghost" onclick="editCompanySection('mission')">✏️</button></div>
+      <div style="padding:18px;font-size:14px;line-height:1.8;color:var(--text)">${esc(co.mission)}</div>
+    </div>
+  </div>
+
+  <!-- OKRs -->
+  <div style="font-size:16px;font-weight:700;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center">
+    <span>📊 Mục tiêu & OKR</span>
+    <button class="btn btn-sm btn-ghost" onclick="addOKR()">＋ Thêm OKR</button>
+  </div>
+  ${okrHTML}
+
+  <!-- Strategy -->
+  <div class="card" style="margin-bottom:18px">
+    <div class="card-header"><div class="card-title">🚀 Chiến lược kinh doanh</div><button class="btn btn-sm btn-ghost" onclick="editCompanySection('strategy')">✏️</button></div>
+    <div style="padding:18px">
+      <div style="margin-bottom:16px">
+        <div style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Định hướng tổng thể</div>
+        <div style="font-size:13px;line-height:1.7;color:var(--text)">${esc(co.strategy.overview)}</div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px">
+        <div>
+          <div style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Thị trường mục tiêu</div>
+          ${targetHTML}
+        </div>
+        <div>
+          <div style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Lợi thế cạnh tranh</div>
+          <div style="font-size:13px;line-height:1.7;color:var(--text)">${esc(co.strategy.competitive)}</div>
+        </div>
+      </div>
+      <div style="margin-top:16px;padding:14px 16px;background:var(--primary-light);border-radius:10px;border:1px solid var(--primary-border)">
+        <div style="font-size:12px;font-weight:700;color:var(--primary-darker);margin-bottom:4px">CHIẾN LƯỢC SẢN PHẨM</div>
+        <div style="font-size:13px;color:var(--text);line-height:1.6">${esc(co.strategy.products)}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Values -->
+  <div style="font-size:16px;font-weight:700;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center">
+    <span>💎 Giá trị cốt lõi</span>
+    <button class="btn btn-sm btn-ghost" onclick="editCompanySection('values')">✏️</button>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-bottom:18px">${valuesHTML}</div>
+
+  <!-- Rules -->
+  <div class="card">
+    <div class="card-header"><div class="card-title">📋 Quy tắc làm việc</div><button class="btn btn-sm btn-ghost" onclick="editCompanySection('rules')">✏️</button></div>
+    <div style="padding:6px 18px 14px">${rulesHTML}</div>
+  </div>`;
+}
+
+// ── Company edit modals ──
+function editCompanySection(section){
+  const co=DB.company;
+  let title,body,saveF;
+  if(section==='vision'){
+    title='✏️ Chỉnh sửa Tầm nhìn & Sứ mệnh';
+    body=`<div class="form-group full" style="margin-bottom:14px"><label>Tầm nhìn (Vision)</label><textarea class="form-control" id="ed-vision" rows="4">${esc(co.vision)}</textarea></div>
+          <div class="form-group full"><label>Sứ mệnh (Mission)</label><textarea class="form-control" id="ed-mission" rows="4">${esc(co.mission)}</textarea></div>`;
+    saveF=()=>{co.vision=document.getElementById('ed-vision').value.trim();co.mission=document.getElementById('ed-mission').value.trim();};
+  } else if(section==='strategy'){
+    title='✏️ Chỉnh sửa Chiến lược';
+    body=`<div class="form-group full" style="margin-bottom:14px"><label>Mục tiêu doanh thu 2026</label><input class="form-control" id="ed-rev" value="${esc(co.strategy.revenueTarget)}"></div>
+          <div class="form-group full" style="margin-bottom:14px"><label>Định hướng tổng thể</label><textarea class="form-control" id="ed-over" rows="3">${esc(co.strategy.overview)}</textarea></div>
+          <div class="form-group full" style="margin-bottom:14px"><label>Thị trường mục tiêu (mỗi dòng 1 thị trường)</label><textarea class="form-control" id="ed-tgt" rows="4">${co.strategy.targets.join('\n')}</textarea></div>
+          <div class="form-group full" style="margin-bottom:14px"><label>Lợi thế cạnh tranh</label><textarea class="form-control" id="ed-comp" rows="3">${esc(co.strategy.competitive)}</textarea></div>
+          <div class="form-group full"><label>Chiến lược sản phẩm</label><textarea class="form-control" id="ed-prod" rows="3">${esc(co.strategy.products)}</textarea></div>`;
+    saveF=()=>{
+      co.strategy.revenueTarget=document.getElementById('ed-rev').value.trim();
+      co.strategy.overview=document.getElementById('ed-over').value.trim();
+      co.strategy.targets=document.getElementById('ed-tgt').value.split('\n').map(s=>s.trim()).filter(Boolean);
+      co.strategy.competitive=document.getElementById('ed-comp').value.trim();
+      co.strategy.products=document.getElementById('ed-prod').value.trim();
+    };
+  } else if(section==='values'){
+    title='✏️ Chỉnh sửa Giá trị cốt lõi';
+    body=co.values.map((v,i)=>`
+      <div style="border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:10px">
+        <div style="display:flex;gap:8px;margin-bottom:8px">
+          <input class="form-control" id="vi-${i}" value="${esc(v.icon)}" style="width:60px;text-align:center;font-size:18px">
+          <input class="form-control" id="vt-${i}" value="${esc(v.title)}" placeholder="Tiêu đề">
+        </div>
+        <textarea class="form-control" id="vd-${i}" rows="2">${esc(v.desc)}</textarea>
+      </div>`).join('');
+    saveF=()=>{co.values=co.values.map((_,i)=>({icon:document.getElementById('vi-'+i).value,title:document.getElementById('vt-'+i).value.trim(),desc:document.getElementById('vd-'+i).value.trim()}));};
+  } else if(section==='rules'){
+    title='✏️ Chỉnh sửa Quy tắc làm việc';
+    body=`<label style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:6px;display:block">Mỗi dòng là một quy tắc</label>
+          <textarea class="form-control" id="ed-rules" rows="10">${co.rules.join('\n')}</textarea>`;
+    saveF=()=>{co.rules=document.getElementById('ed-rules').value.split('\n').map(s=>s.trim()).filter(Boolean);};
+  } else if(section==='overview'){
+    title='✏️ Thông tin chung công ty';
+    body=`<div class="form-grid">
+      <div class="form-group full"><label>Tên đầy đủ</label><input class="form-control" id="ed-name" value="${esc(co.name)}"></div>
+      <div class="form-group"><label>Tên ngắn</label><input class="form-control" id="ed-sname" value="${esc(co.shortName)}"></div>
+      <div class="form-group"><label>Năm thành lập</label><input class="form-control" id="ed-founded" value="${esc(co.founded)}"></div>
+      <div class="form-group full"><label>Slogan / Tagline</label><input class="form-control" id="ed-tag" value="${esc(co.tagline)}"></div>
+    </div>`;
+    saveF=()=>{co.name=document.getElementById('ed-name').value.trim();co.shortName=document.getElementById('ed-sname').value.trim();co.founded=document.getElementById('ed-founded').value.trim();co.tagline=document.getElementById('ed-tag').value.trim();};
+  }
+  document.getElementById('mv-ttl').textContent=title;
+  document.getElementById('mv-body').innerHTML=`<div style="padding-bottom:8px">${body}</div>`;
+  document.querySelector('#m-view .modal-foot').innerHTML=`
+    <button class="btn btn-ghost" onclick="closeM('m-view')">Hủy</button>
+    <button class="btn btn-primary" onclick="saveCompanySection(${JSON.stringify(section)})">💾 Lưu</button>`;
+  openM('m-view');
+}
+function saveCompanySection(section){
+  const saveMap={
+    vision:()=>{DB.company.vision=document.getElementById('ed-vision').value.trim();DB.company.mission=document.getElementById('ed-mission').value.trim();},
+    strategy:()=>{DB.company.strategy.revenueTarget=document.getElementById('ed-rev').value.trim();DB.company.strategy.overview=document.getElementById('ed-over').value.trim();DB.company.strategy.targets=document.getElementById('ed-tgt').value.split('\n').map(s=>s.trim()).filter(Boolean);DB.company.strategy.competitive=document.getElementById('ed-comp').value.trim();DB.company.strategy.products=document.getElementById('ed-prod').value.trim();},
+    values:()=>{DB.company.values=DB.company.values.map((_,i)=>({icon:document.getElementById('vi-'+i).value,title:document.getElementById('vt-'+i).value.trim(),desc:document.getElementById('vd-'+i).value.trim()}));},
+    rules:()=>{DB.company.rules=document.getElementById('ed-rules').value.split('\n').map(s=>s.trim()).filter(Boolean);},
+    overview:()=>{DB.company.name=document.getElementById('ed-name').value.trim();DB.company.shortName=document.getElementById('ed-sname').value.trim();DB.company.founded=document.getElementById('ed-founded').value.trim();DB.company.tagline=document.getElementById('ed-tag').value.trim();},
+  };
+  if(saveMap[section])saveMap[section]();
+  DB.company.updatedAt=new Date().toISOString().slice(0,10);
+  save();toast('Đã lưu ✅');closeM('m-view');rCompany();
+}
+function editOKRProgress(okrId,krIdx){
+  const okr=DB.company.okrs.find(o=>o.id===okrId);if(!okr)return;
+  const kr=okr.krs[krIdx];
+  document.getElementById('mv-ttl').textContent='📝 Cập nhật tiến độ KR';
+  document.getElementById('mv-body').innerHTML=`
+    <div style="margin-bottom:12px;font-size:14px;font-weight:600;color:var(--text)">${esc(kr.kr)}</div>
+    <label style="font-size:12px;font-weight:600;margin-bottom:6px;display:block">Tiến độ hiện tại (%)</label>
+    <div style="display:flex;align-items:center;gap:12px">
+      <input type="range" id="okr-prog" min="0" max="100" value="${kr.progress}" style="flex:1" oninput="document.getElementById('okr-pval').textContent=this.value+'%'">
+      <span id="okr-pval" style="font-size:18px;font-weight:700;color:var(--primary);min-width:48px">${kr.progress}%</span>
+    </div>`;
+  document.querySelector('#m-view .modal-foot').innerHTML=`
+    <button class="btn btn-ghost" onclick="closeM('m-view')">Hủy</button>
+    <button class="btn btn-primary" onclick="saveOKRProgress('${okrId}',${krIdx})">💾 Lưu</button>`;
+  openM('m-view');
+}
+function saveOKRProgress(okrId,krIdx){
+  const okr=DB.company.okrs.find(o=>o.id===okrId);
+  okr.krs[krIdx].progress=+document.getElementById('okr-prog').value;
+  DB.company.updatedAt=new Date().toISOString().slice(0,10);
+  save();toast('Cập nhật tiến độ ✅');closeM('m-view');rCompany();
+}
+function editOKR(okrId){
+  const okr=DB.company.okrs.find(o=>o.id===okrId);if(!okr)return;
+  document.getElementById('mv-ttl').textContent='✏️ Chỉnh sửa OKR';
+  const krsForm=okr.krs.map((k,i)=>`<div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">
+    <input class="form-control" id="kr-${i}" value="${esc(k.kr)}" placeholder="Key Result ${i+1}" style="flex:1">
+    <input type="number" class="form-control" id="kp-${i}" value="${k.progress}" min="0" max="100" style="width:70px" placeholder="%">
+  </div>`).join('');
+  document.getElementById('mv-body').innerHTML=`
+    <div class="form-group full" style="margin-bottom:14px"><label>Objective</label><input class="form-control" id="okr-obj" value="${esc(okr.obj)}"></div>
+    <div class="form-group full" style="margin-bottom:14px"><label>Năm / Quý</label><input class="form-control" id="okr-q" value="${esc(okr.quarter)}"></div>
+    <label style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:8px;display:block">Key Results</label>
+    ${krsForm}`;
+  document.querySelector('#m-view .modal-foot').innerHTML=`
+    <button class="btn btn-ghost btn-sm btn-danger" onclick="deleteOKR('${okrId}')">🗑️ Xóa OKR</button>
+    <button class="btn btn-ghost" onclick="closeM('m-view')">Hủy</button>
+    <button class="btn btn-primary" onclick="saveOKR('${okrId}')">💾 Lưu</button>`;
+  openM('m-view');
+}
+function saveOKR(okrId){
+  const okr=DB.company.okrs.find(o=>o.id===okrId);
+  okr.obj=document.getElementById('okr-obj').value.trim();
+  okr.quarter=document.getElementById('okr-q').value.trim();
+  okr.krs=okr.krs.map((_,i)=>({kr:document.getElementById('kr-'+i).value.trim(),progress:+document.getElementById('kp-'+i).value||0}));
+  DB.company.updatedAt=new Date().toISOString().slice(0,10);
+  save();toast('Đã lưu OKR ✅');closeM('m-view');rCompany();
+}
+function deleteOKR(okrId){
+  DB.company.okrs=DB.company.okrs.filter(o=>o.id!==okrId);
+  save();toast('Đã xóa OKR','info');closeM('m-view');rCompany();
+}
+function addOKR(){
+  const newId='ok'+Date.now();
+  DB.company.okrs.push({id:newId,obj:'Mục tiêu mới',quarter:'2026',krs:[
+    {kr:'Key Result 1',progress:0},{kr:'Key Result 2',progress:0},{kr:'Key Result 3',progress:0}
+  ]});
+  save();rCompany();setTimeout(()=>editOKR(newId),100);
 }
 
 // ═══════ KPI SALES ═══════
