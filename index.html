@@ -156,6 +156,19 @@ textarea.form-control{resize:vertical;min-height:72px}
   .form-grid{grid-template-columns:1fr}
   .ql-head,.ql-row{grid-template-columns:2fr 60px 100px 50px 90px 30px}
 }
+@media print{
+  .sidebar,.topbar,.overlay,#toast-wrap,.modal-bg,.modal-foot,#cfm-bg{display:none!important}
+  .main{margin-left:0!important;padding:0!important}
+  body{background:#fff!important;color:#000!important;font-size:12px}
+  .print-only{display:block!important}
+  .no-print{display:none!important}
+  .card{border:none!important;box-shadow:none!important}
+  table{border-collapse:collapse;width:100%}
+  thead th{background:#f5f5f5!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  th,td{border:1px solid #ddd!important;padding:6px 10px!important}
+  #print-area{display:block!important;padding:20mm 15mm}
+}
+.print-only{display:none}
 </style>
 </head>
 <body>
@@ -180,6 +193,7 @@ textarea.form-control{resize:vertical;min-height:72px}
     <div class="nav-sec">Vận hành</div>
     <div class="nav-item" data-page="products" onclick="nav(this)"><span class="ni">💊</span> Sản phẩm</div>
     <div class="nav-item" data-page="inventory" onclick="nav(this)"><span class="ni">📦</span> Kho hàng</div>
+    <div class="nav-item" data-page="kpi" onclick="nav(this)"><span class="ni">🎯</span> KPI Sales</div>
   </nav>
 </aside>
 <main class="main" id="main">
@@ -188,7 +202,11 @@ textarea.form-control{resize:vertical;min-height:72px}
       <button class="menu-btn" onclick="toggleSB()">☰</button>
       <div><div class="page-title" id="pg-title">Dashboard</div><div class="page-sub" id="pg-sub"></div></div>
     </div>
-    <div class="topbar-right" id="pg-actions"></div>
+    <div class="topbar-right" style="display:flex;align-items:center;gap:8px">
+      <button class="btn btn-ghost btn-sm" onclick="backupData()" title="Tải file JSON về máy">💾 Sao lưu</button>
+      <label class="btn btn-ghost btn-sm" style="cursor:pointer" title="Upload file JSON đã sao lưu">📂 Khôi phục<input type="file" accept=".json" style="display:none" onchange="restoreData(this)"></label>
+      <div id="pg-actions" style="display:flex;align-items:center;gap:8px"></div>
+    </div>
   </div>
   <div id="dashboard" class="page active"></div>
   <div id="customers" class="page"></div>
@@ -199,6 +217,7 @@ textarea.form-control{resize:vertical;min-height:72px}
   <div id="followup" class="page"></div>
   <div id="debt" class="page"></div>
   <div id="regions" class="page"></div>
+  <div id="kpi" class="page"></div>
 </main>
 
 <!-- Customer Modal -->
@@ -492,8 +511,8 @@ function toggleSB(){
 function closeSB(){sbOn=false;document.getElementById('sidebar').classList.remove('open');document.getElementById('overlay').classList.remove('on');}
 
 // ── Nav ──
-const PM={dashboard:{t:'Dashboard',s:''},customers:{t:'Danh sách khách hàng',s:'CRM'},regions:{t:'Khách hàng theo khu vực',s:'Phân bố địa lý'},products:{t:'Sản phẩm & Vật tư',s:'Danh mục'},quotes:{t:'Báo giá',s:''},orders:{t:'Đơn hàng',s:''},inventory:{t:'Kho hàng',s:'Nhập / Xuất / Tồn'},followup:{t:'Follow-up',s:'Lịch liên hệ'},debt:{t:'Công nợ',s:'Thanh toán'}};
-const PFN={dashboard:rDash,customers:rCust,regions:rRegions,products:rProd,quotes:rQuotes,orders:rOrders,inventory:rInv,followup:rFU,debt:rDebt};
+const PM={dashboard:{t:'Dashboard',s:''},customers:{t:'Danh sách khách hàng',s:'CRM'},regions:{t:'Khách hàng theo khu vực',s:'Phân bố địa lý'},products:{t:'Sản phẩm & Vật tư',s:'Danh mục'},quotes:{t:'Báo giá',s:''},orders:{t:'Đơn hàng',s:''},inventory:{t:'Kho hàng',s:'Nhập / Xuất / Tồn'},followup:{t:'Follow-up',s:'Lịch liên hệ'},debt:{t:'Công nợ',s:'Thanh toán'},kpi:{t:'KPI Nhân viên Sales',s:'Hiệu suất bán hàng'}};
+const PFN={dashboard:rDash,customers:rCust,regions:rRegions,products:rProd,quotes:rQuotes,orders:rOrders,inventory:rInv,followup:rFU,debt:rDebt,kpi:rKPI};
 
 function nav(el){
   const p=el.dataset.page;
@@ -529,7 +548,7 @@ function rDash(){
   }).join('')||'<div style="padding:24px;text-align:center;color:var(--muted)">Không có lịch pending</div>';
   const qPend=DB.quotes.filter(q=>q.status==='draft'||q.status==='sent').map(q=>{const c=gc(q.custId);return`<tr><td style="font-family:monospace;font-size:12px">${q.code}</td><td>${esc(c.name)}</td><td style="font-weight:700">${fmt(q.total)}</td><td>${sChip(q.status)}</td><td>${fmtD(q.valid)}</td><td><button class="btn-icon btn-sm" onclick="vQuote('${q.id}')">👁</button></td></tr>`;}).join('')||'<tr class="empty-row"><td colspan="6">Không có báo giá đang chờ</td></tr>';
   document.getElementById('dashboard').innerHTML=`
-  <div class="stats">
+  <div class="stats" id="dash-stats">
     <div class="stat-card"><div class="stat-icon">💰</div><div class="stat-label">Doanh thu tháng ${mo+1}</div><div class="stat-value">${fmtBig(rev)}</div><div class="stat-delta">▲ ${moO.length} đơn hàng</div></div>
     <div class="stat-card"><div class="stat-icon">🏥</div><div class="stat-label">Khách hàng mới</div><div class="stat-value">${newC}</div><div class="stat-delta">Tổng: ${DB.customers.length} KH</div></div>
     <div class="stat-card"><div class="stat-icon">⚠️</div><div class="stat-label">Công nợ</div><div class="stat-value">${fmtBig(totD)}</div><div class="stat-delta ${totD>0?'neg':''}">${DB.customers.filter(c=>debt(c.id)>0).length} KH còn nợ</div></div>
@@ -545,7 +564,18 @@ function rDash(){
   <div class="card" style="margin-top:18px">
     <div class="card-header"><div class="card-title">📄 Báo giá đang chờ</div><button class="btn btn-sm btn-ghost" onclick="nav(document.querySelector('[data-page=quotes]'))">Xem tất cả</button></div>
     <div class="tbl-wrap"><table><thead><tr><th>Mã BG</th><th>Khách hàng</th><th>Tổng tiền</th><th>Trạng thái</th><th>Hiệu lực</th><th></th></tr></thead><tbody>${qPend}</tbody></table></div>
+  </div>
+  <div class="grid-2" style="margin-top:18px">
+    <div class="card">
+      <div class="card-header"><div class="card-title">📈 Doanh thu 6 tháng (triệu ₫)</div></div>
+      <div style="padding:16px;height:220px"><canvas id="chart-rev" role="img" aria-label="Biểu đồ doanh thu 6 tháng gần nhất">Doanh thu theo tháng</canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-header"><div class="card-title">🏆 Top 5 sản phẩm bán chạy</div></div>
+      <div style="padding:16px;height:220px"><canvas id="chart-prod" role="img" aria-label="Top 5 sản phẩm doanh số cao nhất">Top sản phẩm</canvas></div>
+    </div>
   </div>`;
+  setTimeout(renderDashCharts,50);
 }
 
 // ═══════ CUSTOMERS ═══════
@@ -708,15 +738,80 @@ function vQuote(id){
       </select>
       <button class="btn btn-primary btn-sm" onclick="setQS('${id}')">Cập nhật</button>
       ${q.status==='accepted'?`<button class="btn btn-ghost btn-sm" onclick="q2o('${id}');closeM('m-view')">→ Chuyển đơn hàng</button>`:''}
+      <button class="btn btn-ghost btn-sm no-print" onclick="printQuote('${id}')">🖨️ In / PDF</button>
     </div>`;
   openM('m-view');
 }
 function setQS(id){const q=DB.quotes.find(x=>x.id===id);q.status=document.getElementById('qs-sel').value;save();toast('Đã cập nhật');closeM('m-view');rQuotes();}
+function printQuote(id){
+  const q=DB.quotes.find(x=>x.id===id);if(!q)return;
+  const c=gc(q.custId);
+  const rows=q.items.map(i=>`<tr><td>${esc(i.name)}</td><td>${esc(i.unit)}</td><td style="text-align:right">${fmt(i.price)}</td><td style="text-align:center">${fmtN(i.qty)}</td><td style="text-align:right;font-weight:700">${fmt(i.amt)}</td></tr>`).join('');
+  const win=window.open('','_blank');
+  win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Báo giá ${q.code}</title>
+  <style>
+    body{font-family:Arial,sans-serif;font-size:12px;color:#111;padding:20mm 15mm}
+    h1{font-size:18px;color:#C2410C;margin-bottom:4px}
+    .sub{font-size:11px;color:#666;margin-bottom:20px}
+    .info-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:16px;font-size:12px}
+    table{width:100%;border-collapse:collapse;margin-bottom:16px}
+    th{background:#FFF7ED;padding:8px 10px;text-align:left;border:1px solid #FED7AA;font-size:11px}
+    td{padding:7px 10px;border:1px solid #ddd}
+    .total-box{background:#FFF7ED;border:1px solid #FED7AA;border-radius:6px;padding:12px 16px;width:260px;margin-left:auto}
+    .total-row{display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px}
+    .total-final{font-weight:700;font-size:14px;color:#C2410C;border-top:1px solid #FED7AA;padding-top:8px;margin-top:6px}
+    .footer{margin-top:40px;display:grid;grid-template-columns:1fr 1fr;gap:20px;text-align:center;font-size:11px;color:#666}
+    @media print{body{padding:10mm}}
+  </style></head><body>
+  <h1>🏥 CÔNG TY TNHH ANH SÁNG Y TẾ</h1>
+  <div class="sub">TP. Hồ Chí Minh &nbsp;|&nbsp; Tel: (028) xxxx-xxxx &nbsp;|&nbsp; Email: info@anhsangyte.vn</div>
+  <h2 style="font-size:16px;margin-bottom:12px">BÁO GIÁ — ${q.code}</h2>
+  <div class="info-grid">
+    <div><b>Kính gửi:</b> ${esc(c.name)}</div><div><b>Ngày lập:</b> ${fmtD(q.date)}</div>
+    <div><b>Địa chỉ:</b> ${esc(c.addr||'—')}</div><div><b>Hiệu lực đến:</b> ${fmtD(q.valid)}</div>
+    <div><b>Liên hệ:</b> ${esc(c.contact||'—')}</div><div><b>Người lập:</b> ${esc(q.by||'—')}</div>
+  </div>
+  <table><thead><tr><th>Tên sản phẩm</th><th>ĐVT</th><th style="text-align:right">Đơn giá</th><th style="text-align:center">SL</th><th style="text-align:right">Thành tiền</th></tr></thead>
+  <tbody>${rows}</tbody></table>
+  <div class="total-box">
+    <div class="total-row"><span>Tạm tính:</span><span>${fmt(q.sub)}</span></div>
+    <div class="total-row"><span>Chiết khấu (${q.disc}%):</span><span>-${fmt(q.sub*q.disc/100)}</span></div>
+    <div class="total-row"><span>VAT 10%:</span><span>${fmt(q.vat)}</span></div>
+    <div class="total-row total-final"><span>TỔNG CỘNG:</span><span>${fmt(q.total)}</span></div>
+  </div>
+  ${q.notes?`<p style="margin-top:12px;font-size:12px;color:#555"><i>Ghi chú: ${esc(q.notes)}</i></p>`:''}
+  <div class="footer">
+    <div><b>Khách hàng xác nhận</b><br><br><br>(Ký, ghi rõ họ tên)</div>
+    <div><b>Đại diện công ty</b><br><br><br>(Ký, đóng dấu)</div>
+  </div>
+  </body></html>`);
+  win.document.close();
+  setTimeout(()=>win.print(),400);
+}
 function delQ(id){cfm('Xóa báo giá','Xóa báo giá này?',()=>{DB.quotes=DB.quotes.filter(x=>x.id!==id);save();toast('Đã xóa','info');rQuotes();});}
 function q2o(qid){
   const q=DB.quotes.find(x=>x.id===qid);if(!q)return;
-  DB.orders.push({id:gid(),code:'DH-'+String(DB.orders.length+1).padStart(3,'0'),qid,custId:q.custId,date:td(),items:q.items,total:q.total,paid:0,status:'pending',notes:'Từ '+q.code});
-  save();toast('Đã tạo đơn hàng ✅');nav(document.querySelector('[data-page=orders]'));
+  // Kiểm tra tồn kho trước
+  const insufficient=[];
+  q.items.forEach(item=>{
+    if(!item.pid)return;
+    const p=gp(item.pid);
+    if(p&&p.stock<item.qty)insufficient.push(`${p.name} (còn ${fmtN(p.stock)}, cần ${fmtN(item.qty)})`);
+  });
+  if(insufficient.length){
+    if(!confirm('⚠️ Tồn kho không đủ:\n'+insufficient.join('\n')+'\n\nVẫn tạo đơn và trừ kho?'))return;
+  }
+  // Trừ kho tự động
+  const today=td();
+  q.items.forEach(item=>{
+    if(!item.pid)return;
+    const p=gp(item.pid);
+    if(!p)return;
+    p.stock=Math.max(0,p.stock-item.qty);
+    DB.inventory.push({id:gid(),type:'out',pid:item.pid,pname:item.name,qty:item.qty,date:today,note:'Tự động xuất — BG '+q.code});
+  });
+  DB.orders.push({id:gid(),code:'DH-'+String(DB.orders.length+1).padStart(3,'0'),qid,custId:q.custId,date:today,items:q.items,total:q.total,paid:0,status:'pending',notes:'Từ '+q.code});
+  save();toast('Đã tạo đơn hàng + trừ kho tự động ✅');nav(document.querySelector('[data-page=orders]'));
 }
 
 // ═══════ ORDERS ═══════
@@ -907,6 +1002,137 @@ function rRegions(){
     <div class="stat-card"><div class="stat-icon">📊</div><div class="stat-label">KH lớn nhất vùng</div><div class="stat-value" style="font-size:14px">${allRegions.reduce((m,r)=>{const n=DB.customers.filter(c=>(c.region||'TP. Hồ Chí Minh')===r).length;return n>m.n?{n,r}:m;},{n:0,r:'—'}).r}</div><div class="stat-delta">theo số KH</div></div>
   </div>
   ${cards}`;
+}
+
+// ═══════ KPI SALES ═══════
+function rKPI(){
+  document.getElementById('pg-actions').innerHTML='';
+  // Tổng hợp theo người lập báo giá
+  const staff={};
+  DB.quotes.forEach(q=>{
+    const name=(q.by||'Không rõ').trim()||'Không rõ';
+    if(!staff[name])staff[name]={name,quotes:0,accepted:0,totalBG:0,orders:0,revenue:0,newCusts:0};
+    staff[name].quotes++;
+    staff[name].totalBG+=q.total||0;
+    if(q.status==='accepted')staff[name].accepted++;
+  });
+  DB.orders.forEach(o=>{
+    // Tìm BG gốc để lấy người lập
+    const q=o.qid?DB.quotes.find(x=>x.id===o.qid):null;
+    const name=q?(q.by||'Không rõ').trim()||'Không rõ':'Không rõ';
+    if(!staff[name])staff[name]={name,quotes:0,accepted:0,totalBG:0,orders:0,revenue:0,newCusts:0};
+    staff[name].orders++;
+    staff[name].revenue+=o.total||0;
+  });
+  const list=Object.values(staff).sort((a,b)=>b.revenue-a.revenue);
+  const totalRev=list.reduce((s,x)=>s+x.revenue,0);
+  const rows=list.map((s,i)=>{
+    const rate=s.quotes?Math.round(s.accepted/s.quotes*100):0;
+    const share=totalRev?Math.round(s.revenue/totalRev*100):0;
+    return`<tr>
+      <td><span class="av av-sm" style="background:${['#FEF3C7','#DBEAFE','#D1FAE5','#FCE7F3'][i%4]};color:#374151">${(s.name||'?').slice(0,2).toUpperCase()}</span><strong>${esc(s.name)}</strong></td>
+      <td style="text-align:center">${s.quotes}</td>
+      <td style="text-align:center">${s.accepted} <span style="font-size:11px;color:var(--muted)">(${rate}%)</span></td>
+      <td style="text-align:center">${s.orders}</td>
+      <td style="font-weight:700;color:var(--primary-dark)">${fmt(s.revenue)}</td>
+      <td>
+        <div style="display:flex;align-items:center;gap:8px">
+          <div class="prog" style="width:80px"><div class="prog-fill" style="width:${share}%"></div></div>
+          <span style="font-size:12px;font-weight:600">${share}%</span>
+        </div>
+      </td>
+    </tr>`;
+  }).join('')||'<tr class="empty-row"><td colspan="6">Chưa có dữ liệu — hãy điền trường "Người lập" khi tạo báo giá</td></tr>';
+
+  const now=new Date(),mo=now.getMonth(),yr=now.getFullYear();
+  const moRev=DB.orders.filter(o=>{const d=new Date(o.date);return d.getMonth()===mo&&d.getFullYear()===yr&&o.status!=='cancelled';}).reduce((s,o)=>s+o.total,0);
+  const moOrders=DB.orders.filter(o=>{const d=new Date(o.date);return d.getMonth()===mo&&d.getFullYear()===yr&&o.status!=='cancelled';}).length;
+  const totalAccepted=DB.quotes.filter(q=>q.status==='accepted').length;
+  const convRate=DB.quotes.length?Math.round(totalAccepted/DB.quotes.length*100):0;
+
+  document.getElementById('kpi').innerHTML=`
+  <div class="stats">
+    <div class="stat-card"><div class="stat-icon">💰</div><div class="stat-label">Doanh thu tháng ${mo+1}</div><div class="stat-value">${fmtBig(moRev)}</div><div class="stat-delta">${moOrders} đơn hàng</div></div>
+    <div class="stat-card"><div class="stat-icon">📄</div><div class="stat-label">Tổng báo giá</div><div class="stat-value">${DB.quotes.length}</div><div class="stat-delta">${totalAccepted} chấp nhận</div></div>
+    <div class="stat-card"><div class="stat-icon">🎯</div><div class="stat-label">Tỉ lệ chốt đơn</div><div class="stat-value">${convRate}%</div><div class="stat-delta">${DB.quotes.filter(q=>q.status==='sent').length} BG đang chờ</div></div>
+    <div class="stat-card"><div class="stat-icon">👥</div><div class="stat-label">Nhân viên sales</div><div class="stat-value">${list.length}</div><div class="stat-delta">Tổng ${DB.customers.length} KH</div></div>
+  </div>
+  <div class="card">
+    <div class="card-header"><div class="card-title">🏅 Bảng xếp hạng nhân viên</div><span style="font-size:12px;color:var(--muted)">Dựa trên trường "Người lập" trong báo giá</span></div>
+    <div class="tbl-wrap"><table><thead><tr><th>Nhân viên</th><th style="text-align:center">Số BG</th><th style="text-align:center">BG chốt</th><th style="text-align:center">Đơn hàng</th><th>Doanh số</th><th>Thị phần</th></tr></thead><tbody>${rows}</tbody></table></div>
+  </div>
+  <div class="card" style="margin-top:18px">
+    <div class="card-header"><div class="card-title">💡 Hướng dẫn</div></div>
+    <div style="padding:16px;font-size:13px;color:var(--muted);line-height:1.7">
+      Để KPI chính xác: khi tạo báo giá, luôn điền <strong style="color:var(--text)">trường "Người lập"</strong> bằng tên nhân viên (VD: Minh N., Lan T.).
+      Hệ thống tự tổng hợp doanh số theo tên người lập.
+    </div>
+  </div>`;
+}
+
+// ═══════ CHARTS (Chart.js — loaded on first use) ═══════
+let chartJsLoaded=false;
+function loadChartJs(cb){
+  if(chartJsLoaded){cb();return;}
+  const s=document.createElement('script');
+  s.src='https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js';
+  s.onload=()=>{chartJsLoaded=true;cb();};
+  document.head.appendChild(s);
+}
+let _revChart=null,_prodChart=null;
+function renderDashCharts(){
+  loadChartJs(()=>{
+    // Doanh thu 6 tháng gần nhất
+    const now=new Date();
+    const months=[],revs=[];
+    for(let i=5;i>=0;i--){
+      const d=new Date(now.getFullYear(),now.getMonth()-i,1);
+      const mo=d.getMonth(),yr=d.getFullYear();
+      months.push(`T${mo+1}/${yr.toString().slice(2)}`);
+      const rev=DB.orders.filter(o=>{const od=new Date(o.date);return od.getMonth()===mo&&od.getFullYear()===yr&&o.status!=='cancelled';}).reduce((s,o)=>s+o.total,0);
+      revs.push(Math.round(rev/1000000));
+    }
+    // Top 5 sản phẩm theo doanh số
+    const prodSales={};
+    DB.orders.forEach(o=>o.items.forEach(it=>{prodSales[it.name]=(prodSales[it.name]||0)+(it.amt||0);}));
+    const top5=Object.entries(prodSales).sort((a,b)=>b[1]-a[1]).slice(0,5);
+
+    if(_revChart){_revChart.destroy();_revChart=null;}
+    if(_prodChart){_prodChart.destroy();_prodChart=null;}
+
+    const ctx1=document.getElementById('chart-rev');
+    const ctx2=document.getElementById('chart-prod');
+    if(!ctx1||!ctx2)return;
+
+    _revChart=new Chart(ctx1,{type:'bar',data:{labels:months,datasets:[{label:'Triệu ₫',data:revs,backgroundColor:'rgba(249,115,22,0.75)',borderRadius:6,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{ticks:{callback:v=>v+'M'},grid:{color:'rgba(0,0,0,.05)'}},x:{grid:{display:false}}}}});
+    _prodChart=new Chart(ctx2,{type:'doughnut',data:{labels:top5.map(([n])=>n.length>18?n.slice(0,16)+'…':n),datasets:[{data:top5.map(([,v])=>Math.round(v/1000000)),backgroundColor:['#F97316','#3B82F6','#10B981','#F59E0B','#EF4444'],borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{font:{size:11},boxWidth:12,padding:10}}}}});
+  });
+}
+
+// ═══════ BACKUP / RESTORE ═══════
+function backupData(){
+  const blob=new Blob([JSON.stringify(DB,null,2)],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  const d=new Date();
+  a.download=`medcrm-backup-${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}.json`;
+  a.click();URL.revokeObjectURL(a.href);
+  toast('Đã tải file sao lưu ✅');
+}
+function restoreData(input){
+  const file=input.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    try{
+      const data=JSON.parse(e.target.result);
+      if(!data.customers||!data.products){toast('File không hợp lệ','error');return;}
+      DB=data;save();
+      toast('Khôi phục thành công ✅ — '+data.customers.length+' KH, '+data.products.length+' SP');
+      rDash();badges();
+    }catch(err){toast('Lỗi đọc file: '+err.message,'error');}
+    input.value='';
+  };
+  reader.readAsText(file);
 }
 
 // ═══════ INIT ═══════
