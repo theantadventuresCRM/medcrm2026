@@ -169,6 +169,33 @@ textarea.form-control{resize:vertical;min-height:72px}
   #print-area{display:block!important;padding:20mm 15mm}
 }
 .print-only{display:none}
+/* ── Employee & Finance ── */
+.emp-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px 20px;display:flex;align-items:flex-start;gap:16px;transition:box-shadow .15s}
+.emp-card:hover{box-shadow:0 4px 16px rgba(0,0,0,.08)}
+.emp-av{width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--primary-darker));display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:#fff;flex-shrink:0}
+.emp-name{font-size:15px;font-weight:700;margin-bottom:2px}
+.emp-pos{font-size:12px;color:var(--primary-dark);font-weight:600;margin-bottom:6px}
+.emp-meta{font-size:12px;color:var(--muted);display:flex;gap:14px;flex-wrap:wrap}
+.emp-meta span{display:flex;align-items:center;gap:4px}
+.emp-salary-blurred{filter:blur(5px);user-select:none;transition:filter .3s}
+.emp-salary-blurred.revealed{filter:none}
+.pin-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:600;display:flex;align-items:center;justify-content:center}
+.pin-box{background:#fff;border-radius:16px;padding:28px 32px;max-width:360px;width:100%;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,.2)}
+.pin-box h3{font-size:18px;font-weight:700;margin-bottom:6px}
+.pin-box p{font-size:13px;color:var(--muted);margin-bottom:18px}
+.pin-input{width:100%;padding:12px 16px;border:2px solid var(--border);border-radius:10px;font-size:20px;text-align:center;letter-spacing:6px;outline:none;margin-bottom:14px}
+.pin-input:focus{border-color:var(--primary)}
+.fin-stat{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px 18px;position:relative;overflow:hidden}
+.fin-stat::before{content:'';position:absolute;top:0;left:0;width:4px;height:100%;background:var(--primary)}
+.fin-stat.green::before{background:var(--green)}
+.fin-stat.red::before{background:var(--red)}
+.fin-stat.blue::before{background:var(--blue)}
+.tab-bar{display:flex;gap:4px;padding:6px;background:var(--bg);border-radius:10px;margin-bottom:18px;border:1px solid var(--border)}
+.tab-btn{flex:1;padding:8px 14px;border:none;border-radius:7px;font-size:13px;font-weight:600;cursor:pointer;background:none;color:var(--muted);transition:all .15s}
+.tab-btn.active{background:var(--card);color:var(--primary);box-shadow:0 1px 4px rgba(0,0,0,.1)}
+.budget-row{display:grid;grid-template-columns:2fr 110px 110px 90px;gap:8px;align-items:center;padding:10px 14px;border-bottom:1px solid var(--border)}
+.budget-row:last-child{border-bottom:none}
+.budget-row.header{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;background:var(--bg);border-radius:8px 8px 0 0}
 </style>
 </head>
 <body>
@@ -194,7 +221,10 @@ textarea.form-control{resize:vertical;min-height:72px}
     <div class="nav-item" data-page="products" onclick="nav(this)"><span class="ni">💊</span> Sản phẩm</div>
     <div class="nav-item" data-page="inventory" onclick="nav(this)"><span class="ni">📦</span> Kho hàng</div>
     <div class="nav-item" data-page="kpi" onclick="nav(this)"><span class="ni">🎯</span> KPI Sales</div>
+    <div class="nav-sec">Tài chính</div>
+    <div class="nav-item" data-page="accounting" onclick="nav(this)"><span class="ni">📒</span> Kế toán</div>
     <div class="nav-sec">Doanh nghiệp</div>
+    <div class="nav-item" data-page="employees" onclick="nav(this)"><span class="ni">👥</span> Nhân viên <span class="badge" id="badge-emp">0</span></div>
     <div class="nav-item" data-page="company" onclick="nav(this)"><span class="ni">🏢</span> Công ty</div>
   </nav>
 </aside>
@@ -220,6 +250,8 @@ textarea.form-control{resize:vertical;min-height:72px}
   <div id="debt" class="page"></div>
   <div id="regions" class="page"></div>
   <div id="kpi" class="page"></div>
+  <div id="accounting" class="page"></div>
+  <div id="employees" class="page"></div>
   <div id="company" class="page"></div>
 </main>
 
@@ -347,19 +379,107 @@ textarea.form-control{resize:vertical;min-height:72px}
   </div>
 </div>
 
+<!-- Employee Modal -->
+<div class="modal-bg" id="m-emp">
+  <div class="modal modal-lg">
+    <div class="modal-head"><div class="modal-title" id="me-ttl">Thêm nhân viên</div><button class="modal-close" onclick="closeM('m-emp')">✕</button></div>
+    <div class="modal-body"><div class="form-grid">
+      <div class="form-group full"><label>Họ và tên đầy đủ *</label><input class="form-control" id="me-name" placeholder="VD: Nguyễn Văn An"></div>
+      <div class="form-group"><label>Chức vụ *</label><input class="form-control" id="me-pos" placeholder="VD: Nhân viên Sales"></div>
+      <div class="form-group"><label>Phòng ban</label><select class="form-control" id="me-dept"><option>Kinh doanh</option><option>Kế toán</option><option>Kho vận</option><option>Hành chính - NS</option><option>Ban lãnh đạo</option></select></div>
+      <div class="form-group"><label>Email</label><input class="form-control" id="me-email" type="email"></div>
+      <div class="form-group"><label>Số điện thoại</label><input class="form-control" id="me-phone"></div>
+      <div class="form-group"><label>Ngày vào làm</label><input class="form-control" id="me-start" type="date"></div>
+      <div class="form-group"><label>Trạng thái</label><select class="form-control" id="me-status"><option value="active">✅ Đang làm</option><option value="probation">🔶 Thử việc</option><option value="left">⛔ Đã nghỉ</option></select></div>
+      <div class="form-group full"><label>🏦 Tài khoản ngân hàng <span style="color:var(--muted);font-weight:400">(mã hoá — chỉ chủ xem)</span></label><input class="form-control" id="me-bank" placeholder="VD: Vietcombank - 0451000123456 - CN TP.HCM"></div>
+      <div style="grid-column:1/-1;padding:12px 0 4px;font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;border-top:1px solid var(--border)">💰 Lương bổng</div>
+      <div class="form-group"><label>Lương cơ bản (₫/tháng)</label><input class="form-control" id="me-base" type="number" min="0" placeholder="0"></div>
+      <div class="form-group"><label>Phụ cấp (₫/tháng)</label><input class="form-control" id="me-allow" type="number" min="0" placeholder="0"></div>
+      <div class="form-group"><label>Thưởng KPI (₫/tháng)</label><input class="form-control" id="me-kpi" type="number" min="0" placeholder="0"></div>
+      <div class="form-group"><label>Hoa hồng bậc thang</label><select class="form-control" id="me-comm"><option value="yes">Có — &lt;10tr:1% | 10-20tr:2% | &gt;20tr:3%</option><option value="no">Không áp dụng</option></select></div>
+      <div class="form-group full"><label>Thành tích / Cống hiến nổi bật</label><textarea class="form-control" id="me-achieve" rows="3" placeholder="Mô tả thành tích, đóng góp của nhân viên..."></textarea></div>
+    </div></div>
+    <div class="modal-foot"><button class="btn btn-ghost" onclick="closeM('m-emp')">Hủy</button><button class="btn btn-primary" onclick="saveEmp()">💾 Lưu</button></div>
+  </div>
+</div>
+
+<!-- Finance Transaction Modal -->
+<div class="modal-bg" id="m-fin">
+  <div class="modal">
+    <div class="modal-head"><div class="modal-title" id="mfin-ttl">Ghi nhận giao dịch</div><button class="modal-close" onclick="closeM('m-fin')">✕</button></div>
+    <div class="modal-body"><div class="form-grid">
+      <div class="form-group"><label>Loại *</label>
+        <select class="form-control" id="mfin-type" onchange="updateFinCat()">
+          <option value="thu">💚 Thu tiền</option>
+          <option value="chi">🔴 Chi tiền</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Danh mục *</label>
+        <select class="form-control" id="mfin-cat">
+          <option value="ban-hang">Bán hàng / Thu nợ</option>
+          <option value="nhap-hang">Nhập hàng / Kho</option>
+          <option value="luong">Lương & Thưởng</option>
+          <option value="van-hanh">Vận hành</option>
+          <option value="khac">Khác</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Số tiền (₫) *</label><input class="form-control" id="mfin-amt" type="number" min="0"></div>
+      <div class="form-group"><label>Ngày</label><input class="form-control" id="mfin-date" type="date"></div>
+      <div class="form-group full"><label>Mô tả / Nội dung</label><input class="form-control" id="mfin-desc" placeholder="VD: Thu tiền đơn DH-005, Lương tháng 5..."></div>
+      <div class="form-group"><label>Tham chiếu (số đơn/BG)</label><input class="form-control" id="mfin-ref" placeholder="VD: DH-001"></div>
+      <div class="form-group"><label>Ngân hàng / Tiền mặt</label>
+        <select class="form-control" id="mfin-bank">
+          <option>Chuyển khoản</option><option>Tiền mặt</option><option>Séc</option>
+        </select>
+      </div>
+    </div></div>
+    <div class="modal-foot"><button class="btn btn-ghost" onclick="closeM('m-fin')">Hủy</button><button class="btn btn-primary" onclick="saveFin()">💾 Lưu</button></div>
+  </div>
+</div>
+
+<!-- PIN Overlay -->
+<div id="pin-overlay" style="display:none">
+  <div class="pin-overlay" onclick="if(event.target===this)closePinOverlay()">
+    <div class="pin-box">
+      <div style="font-size:32px;margin-bottom:10px">🔒</div>
+      <h3>Thông tin bảo mật</h3>
+      <p>Nhập mật khẩu để xem lương & tài khoản ngân hàng</p>
+      <input type="password" class="pin-input" id="pin-input" placeholder="••••••" onkeydown="if(event.key==='Enter')checkPin()">
+      <div style="display:flex;gap:10px">
+        <button class="btn btn-ghost" style="flex:1" onclick="closePinOverlay()">Hủy</button>
+        <button class="btn btn-primary" style="flex:1" onclick="checkPin()">🔓 Xác nhận</button>
+      </div>
+      <div id="pin-err" style="color:var(--red);font-size:13px;margin-top:10px;display:none">❌ Mật khẩu không đúng</div>
+      <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--border)">
+        <button class="btn btn-ghost btn-sm" onclick="showChangePinForm()" style="width:100%">⚙️ Đổi mật khẩu</button>
+        <div id="change-pin-form" style="display:none;margin-top:12px">
+          <input type="password" class="form-control" id="new-pin" placeholder="Mật khẩu mới" style="margin-bottom:8px">
+          <button class="btn btn-primary btn-sm" style="width:100%" onclick="changePin()">Lưu mật khẩu mới</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- Confirm -->
 <div id="cfm-bg"><div class="cfm-box"><h3 id="cfm-ttl">Xác nhận</h3><p id="cfm-msg"></p><div class="cfm-btns"><button class="btn btn-ghost" onclick="closeCfm()">Hủy</button><button class="btn btn-danger" id="cfm-ok">Xóa</button></div></div></div>
 <div id="toast-wrap"></div>
 
 <script>
-const SK='medcrm_v3';
-let DB={customers:[],products:[],quotes:[],orders:[],inventory:[],followups:[],payments:[],company:null};
+const SK='medcrm_v4';
+let DB={customers:[],products:[],quotes:[],orders:[],inventory:[],followups:[],payments:[],employees:[],finance:[],company:null};
+let HR_PIN='admin';
 
 function save(){localStorage.setItem(SK,JSON.stringify(DB));badges();}
 function load(){
   try{const d=localStorage.getItem(SK);if(d)DB=JSON.parse(d);}catch(e){}
   if(!DB.customers||!DB.customers.length)seed();
+  if(!DB.employees||!DB.employees.length)DB.employees=seedEmployees();
+  if(!DB.finance||!DB.finance.length)DB.finance=seedFinance();
   if(!DB.company)DB.company=seedCompany();
+  if(!DB.employees)DB.employees=[];
+  if(!DB.finance)DB.finance=[];
+  if(DB.hrPin)HR_PIN=DB.hrPin;
 }
 
 function seedCompany(){
@@ -520,6 +640,63 @@ function seed(){
   save();
 }
 
+function seedEmployees(){
+  const d=n=>{const x=new Date();x.setDate(x.getDate()+n);return x.toISOString().slice(0,10);};
+  return [
+    {id:'e1',code:'NV001',name:'Nguyễn Văn Thắng',pos:'Giám đốc Kinh doanh',dept:'Ban lãnh đạo',email:'thang.nv@anhsangyte.vn',phone:'0901 234 567',bank:'Vietcombank · 0451000123456 · CN TP.HCM',startDate:'2010-03-15',baseSalary:25000000,allowance:5000000,kpiBonus:4000000,commission:'yes',achieve:'Xây dựng đội ngũ sales từ 2 lên 8 người. Tăng doanh thu 3x trong 5 năm (2018–2023). Ký kết thành công hợp đồng BV Chợ Rẫy và BV TW Cần Thơ. Người thiết lập quy trình CRM đầu tiên cho công ty.',status:'active'},
+    {id:'e2',code:'NV002',name:'Trần Thị Lan',pos:'Trưởng nhóm Sales miền Nam',dept:'Kinh doanh',email:'lan.tt@anhsangyte.vn',phone:'0912 345 678',bank:'Techcombank · 19033456789 · CN Tân Bình',startDate:'2016-07-01',baseSalary:18000000,allowance:3000000,kpiBonus:2500000,commission:'yes',achieve:'Phụ trách portfolio 7 bệnh viện công tuyến tỉnh. Đạt 125% KPI năm 2025. Đào tạo 3 nhân viên sales mới. Ký được hợp đồng khung với PXN Medlab Q10.',status:'active'},
+    {id:'e3',code:'NV003',name:'Lê Minh Hùng',pos:'Nhân viên Sales',dept:'Kinh doanh',email:'hung.lm@anhsangyte.vn',phone:'0933 456 789',bank:'BIDV · 31410001234567 · CN Quận 5',startDate:'2019-02-10',baseSalary:12000000,allowance:2000000,kpiBonus:1500000,commission:'yes',achieve:'Phát triển 5 khách hàng mới tại khu vực Đồng Nai & Bình Dương năm 2024. Doanh số tháng cao nhất: 38 triệu. Được bầu nhân viên xuất sắc Q3/2024.',status:'active'},
+    {id:'e4',code:'NV004',name:'Phạm Thị Thu Hà',pos:'Kế toán trưởng',dept:'Kế toán',email:'ha.ptt@anhsangyte.vn',phone:'0944 567 890',bank:'Vietinbank · 108002345678 · CN Bình Thạnh',startDate:'2014-05-20',baseSalary:16000000,allowance:2500000,kpiBonus:1000000,commission:'no',achieve:'Xây dựng hệ thống sổ sách kế toán từ đầu năm 2014. Tiết kiệm 120 triệu chi phí vận hành qua tối ưu dòng tiền năm 2023. Kiểm soát công nợ quá hạn xuống dưới 8%.',status:'active'},
+    {id:'e5',code:'NV005',name:'Hoàng Văn Đức',pos:'Thủ kho kiêm Giao hàng',dept:'Kho vận',email:'duc.hv@anhsangyte.vn',phone:'0955 678 901',bank:'Agribank · 1400205234567 · CN Gò Vấp',startDate:'2017-09-01',baseSalary:10000000,allowance:2500000,kpiBonus:800000,commission:'no',achieve:'Duy trì tỷ lệ giao hàng đúng hạn 97.5% trong 3 năm liên tiếp. Xây dựng quy trình kiểm kho hàng tuần giúp giảm thất thoát 85%. Quản lý kho 35 mặt hàng không để hết hàng đột xuất.',status:'active'},
+    {id:'e6',code:'NV006',name:'Võ Thị Bích Ngọc',pos:'Nhân viên Sales',dept:'Kinh doanh',email:'ngoc.vtb@anhsangyte.vn',phone:'0966 789 012',bank:'MB Bank · 0981234567 · CN Quận 7',startDate:'2021-04-15',baseSalary:11000000,allowance:2000000,kpiBonus:1200000,commission:'yes',achieve:'Phụ trách khu vực Long An & Tiền Giang. Mở mới 4 phòng khám tư nhân năm 2024. Tỷ lệ chốt báo giá đạt 72% — cao nhất nhóm sales.',status:'active'},
+    {id:'e7',code:'NV007',name:'Đặng Minh Khoa',pos:'Nhân viên Sales',dept:'Kinh doanh',email:'khoa.dm@anhsangyte.vn',phone:'0977 890 123',bank:'Sacombank · 060137654321 · CN Tân Phú',startDate:'2022-08-01',baseSalary:10500000,allowance:2000000,kpiBonus:900000,commission:'yes',achieve:'Nhân viên mới xuất sắc năm 2023. Phát triển mảng kit xét nghiệm tại khu vực An Giang & Đồng Tháp. Doanh số tháng 5/2026 đạt 22 triệu.',status:'active'},
+    {id:'e8',code:'NV008',name:'Nguyễn Thị Kim Anh',pos:'Chăm sóc khách hàng',dept:'Kinh doanh',email:'anh.ntk@anhsangyte.vn',phone:'0988 901 234',bank:'VPBank · 117000987654 · CN Phú Nhuận',startDate:'2020-11-01',baseSalary:9500000,allowance:1500000,kpiBonus:700000,commission:'no',achieve:'Duy trì tỷ lệ hài lòng khách hàng 94%. Xử lý trung bình 45 yêu cầu/ngày. Thiết lập quy trình follow-up 7 ngày sau giao hàng giúp giảm khiếu nại 60%.',status:'active'},
+    {id:'e9',code:'NV009',name:'Trần Văn Tài',pos:'Nhân viên Sales',dept:'Kinh doanh',email:'tai.tv@anhsangyte.vn',phone:'0909 012 345',bank:'Techcombank · 19034567890 · CN Cần Thơ',startDate:'2023-03-01',baseSalary:9000000,allowance:1500000,kpiBonus:600000,commission:'yes',achieve:'Phụ trách khu vực Cần Thơ & ĐBSCL. Đã tiếp cận thành công BV TW Cần Thơ và BV Đa Khoa TT An Giang. Đang trong quá trình thử nghiệm 6 tháng đầu năm 2026.',status:'active'},
+    {id:'e10',code:'NV010',name:'Lê Thị Phương',pos:'Hành chính - Nhân sự',dept:'Hành chính - NS',email:'phuong.lt@anhsangyte.vn',phone:'0910 123 456',bank:'Vietcombank · 0451000654321 · CN TP.HCM',startDate:'2018-06-01',baseSalary:11000000,allowance:1500000,kpiBonus:500000,commission:'no',achieve:'Tổ chức thành công 3 đợt tuyển dụng nhân viên sales năm 2021–2023. Xây dựng bộ quy trình onboarding rút ngắn thời gian làm quen từ 3 tháng xuống còn 6 tuần. Quản lý hồ sơ pháp lý 100% không thiếu sót.',status:'active'},
+  ];
+}
+
+function seedFinance(){
+  const dm=(mo,day)=>{const n=new Date();n.setDate(1);n.setMonth(n.getMonth()-mo);n.setDate(day);return n.toISOString().slice(0,10);};
+  const entries=[];
+  // Doanh thu bán hàng 6 tháng
+  [[5,8,45000000,'Thu đơn hàng tháng 12/2025','ban-hang','thu'],
+   [4,5,52000000,'Thu đơn hàng tháng 1/2026','ban-hang','thu'],
+   [3,7,61000000,'Thu đơn hàng tháng 2/2026','ban-hang','thu'],
+   [2,6,58000000,'Thu đơn hàng tháng 3/2026','ban-hang','thu'],
+   [1,9,74000000,'Thu đơn hàng tháng 4/2026','ban-hang','thu'],
+   [0,15,38000000,'Thu đơn hàng tháng 5/2026 (chưa đủ)','ban-hang','thu'],
+   // Thu nợ
+   [2,15,12000000,'Thu nợ BV An Giang','ban-hang','thu'],
+   [1,20,8500000,'Thu cọc BV TW Cần Thơ','ban-hang','thu'],
+   [0,1,17081950,'Thu đơn DH-001 BV Chợ Rẫy','ban-hang','thu'],
+   // Chi nhập hàng
+   [5,3,22000000,'Nhập hàng từ Công ty Bình Thuận T12','nhap-hang','chi'],
+   [4,2,26000000,'Nhập hàng từ Abbott VN + BD Vietnam T1','nhap-hang','chi'],
+   [3,4,24000000,'Nhập hàng từ Roche VN + SD Biosensor T2','nhap-hang','chi'],
+   [2,3,28000000,'Nhập hàng từ Công ty Bình Thuận + 3M T3','nhap-hang','chi'],
+   [1,5,32000000,'Nhập hàng tổng hợp T4/2026','nhap-hang','chi'],
+   [0,10,18000000,'Nhập hàng Omron + Medcare T5/2026','nhap-hang','chi'],
+   // Chi lương
+   [5,28,48500000,'Lương nhân viên tháng 12/2025','luong','chi'],
+   [4,28,48500000,'Lương nhân viên tháng 1/2026','luong','chi'],
+   [3,28,50000000,'Lương + thưởng Tết tháng 2/2026','luong','chi'],
+   [2,28,48500000,'Lương nhân viên tháng 3/2026','luong','chi'],
+   [1,28,52000000,'Lương + thưởng KPI Q1 tháng 4/2026','luong','chi'],
+   [0,28,48500000,'Lương nhân viên tháng 5/2026','luong','chi'],
+   // Chi vận hành
+   [5,10,3500000,'Xăng xe + giao hàng T12','van-hanh','chi'],
+   [4,10,4200000,'Thuê văn phòng + điện nước T1','van-hanh','chi'],
+   [3,10,3800000,'Xăng xe + điện thoại + tiếp khách T2','van-hanh','chi'],
+   [2,10,4500000,'Vận hành tổng hợp T3','van-hanh','chi'],
+   [1,10,4100000,'Vận hành tổng hợp T4','van-hanh','chi'],
+   [0,10,3200000,'Vận hành tháng 5/2026','van-hanh','chi'],
+  ].forEach((r,i)=>{
+    entries.push({id:'fin'+(i+1),type:r[5],cat:r[4],amt:r[2],date:dm(r[0],r[1]),desc:r[3],ref:'',bank:'Chuyển khoản'});
+  });
+  return entries;
+}
+
 // ── Utilities ──
 function gid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,5);}
 function td(){return new Date().toISOString().slice(0,10);}
@@ -568,8 +745,8 @@ function toggleSB(){
 function closeSB(){sbOn=false;document.getElementById('sidebar').classList.remove('open');document.getElementById('overlay').classList.remove('on');}
 
 // ── Nav ──
-const PM={dashboard:{t:'Dashboard',s:''},customers:{t:'Danh sách khách hàng',s:'CRM'},regions:{t:'Khách hàng theo khu vực',s:'Phân bố địa lý'},products:{t:'Sản phẩm & Vật tư',s:'Danh mục'},quotes:{t:'Báo giá',s:''},orders:{t:'Đơn hàng',s:''},inventory:{t:'Kho hàng',s:'Nhập / Xuất / Tồn'},followup:{t:'Follow-up',s:'Lịch liên hệ'},debt:{t:'Công nợ',s:'Thanh toán'},kpi:{t:'KPI Nhân viên Sales',s:'Hiệu suất bán hàng'},company:{t:'Hồ sơ Công ty',s:'Tầm nhìn · Chiến lược · Văn hóa'}};
-const PFN={dashboard:rDash,customers:rCust,regions:rRegions,products:rProd,quotes:rQuotes,orders:rOrders,inventory:rInv,followup:rFU,debt:rDebt,kpi:rKPI,company:rCompany};
+const PM={dashboard:{t:'Dashboard',s:''},customers:{t:'Danh sách khách hàng',s:'CRM'},regions:{t:'Khách hàng theo khu vực',s:'Phân bố địa lý'},products:{t:'Sản phẩm & Vật tư',s:'Danh mục'},quotes:{t:'Báo giá',s:''},orders:{t:'Đơn hàng',s:''},inventory:{t:'Kho hàng',s:'Nhập / Xuất / Tồn'},followup:{t:'Follow-up',s:'Lịch liên hệ'},debt:{t:'Công nợ',s:'Thanh toán'},kpi:{t:'KPI Nhân viên Sales',s:'Hiệu suất bán hàng'},accounting:{t:'Kế toán',s:'Thu Chi · P&L · Ngân sách · Dòng tiền'},employees:{t:'Nhân viên',s:'Hồ sơ · Lương bổng · Thành tích'},company:{t:'Hồ sơ Công ty',s:'Tầm nhìn · Chiến lược · Văn hóa'}};
+const PFN={dashboard:rDash,customers:rCust,regions:rRegions,products:rProd,quotes:rQuotes,orders:rOrders,inventory:rInv,followup:rFU,debt:rDebt,kpi:rKPI,accounting:rAccounting,employees:rEmployees,company:rCompany};
 
 function nav(el){
   const p=el.dataset.page;
@@ -584,6 +761,7 @@ function badges(){
   document.getElementById('badge-fu').textContent=DB.followups.filter(f=>f.status==='pending').length;
   document.getElementById('badge-q').textContent=DB.quotes.filter(q=>q.status==='draft'||q.status==='sent').length;
   document.getElementById('badge-debt').textContent=DB.customers.filter(c=>debt(c.id)>0).length;
+  document.getElementById('badge-emp').textContent=DB.employees.filter(e=>e.status==='active').length;
 }
 
 // ═══════ DASHBOARD ═══════
@@ -1415,6 +1593,420 @@ function renderDashCharts(){
 
     _revChart=new Chart(ctx1,{type:'bar',data:{labels:months,datasets:[{label:'Triệu ₫',data:revs,backgroundColor:'rgba(249,115,22,0.75)',borderRadius:6,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{ticks:{callback:v=>v+'M'},grid:{color:'rgba(0,0,0,.05)'}},x:{grid:{display:false}}}}});
     _prodChart=new Chart(ctx2,{type:'doughnut',data:{labels:top5.map(([n])=>n.length>18?n.slice(0,16)+'…':n),datasets:[{data:top5.map(([,v])=>Math.round(v/1000000)),backgroundColor:['#F97316','#3B82F6','#10B981','#F59E0B','#EF4444'],borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{font:{size:11},boxWidth:12,padding:10}}}}});
+  });
+}
+
+// ═══════ PIN / HR SECURITY ═══════
+let pinUnlocked=false,pinCallback=null;
+function requirePin(cb){
+  if(pinUnlocked){cb();return;}
+  pinCallback=cb;
+  document.getElementById('pin-overlay').style.display='block';
+  document.getElementById('pin-input').value='';
+  document.getElementById('pin-err').style.display='none';
+  document.getElementById('change-pin-form').style.display='none';
+  setTimeout(()=>document.getElementById('pin-input').focus(),100);
+}
+function checkPin(){
+  const v=document.getElementById('pin-input').value;
+  if(v===HR_PIN){pinUnlocked=true;closePinOverlay();if(pinCallback){pinCallback();pinCallback=null;}}
+  else{document.getElementById('pin-err').style.display='block';}
+}
+function closePinOverlay(){document.getElementById('pin-overlay').style.display='none';}
+function showChangePinForm(){document.getElementById('change-pin-form').style.display=document.getElementById('change-pin-form').style.display==='none'?'block':'none';}
+function changePin(){
+  const np=document.getElementById('new-pin').value.trim();
+  if(!np||np.length<4){toast('Mật khẩu tối thiểu 4 ký tự','error');return;}
+  HR_PIN=np;DB.hrPin=np;save();
+  toast('Đã đổi mật khẩu ✅');closePinOverlay();
+}
+
+// ═══════ EMPLOYEES ═══════
+let empF={s:'',dept:''};
+function rEmployees(){
+  document.getElementById('pg-actions').innerHTML=`<button class="btn btn-primary" onclick="openEmpM()">＋ Thêm nhân viên</button>`;
+  const depts=[...new Set(DB.employees.map(e=>e.dept))].sort();
+  const list=DB.employees.filter(e=>
+    (!empF.s||e.name.toLowerCase().includes(empF.s.toLowerCase())||e.pos.toLowerCase().includes(empF.s.toLowerCase()))&&
+    (!empF.dept||e.dept===empF.dept)
+  );
+  const statusColor={active:'var(--green)',probation:'var(--amber)',left:'var(--red)'};
+  const statusLabel={active:'Đang làm',probation:'Thử việc',left:'Đã nghỉ'};
+
+  // Stats
+  const active=DB.employees.filter(e=>e.status==='active').length;
+  const totalSalary=DB.employees.filter(e=>e.status==='active').reduce((s,e)=>s+(e.baseSalary||0)+(e.allowance||0)+(e.kpiBonus||0),0);
+  const deptCount=[...new Set(DB.employees.map(e=>e.dept))].length;
+
+  const cards=list.map(e=>{
+    const years=e.startDate?Math.floor((new Date()-new Date(e.startDate))/31536e6):0;
+    const months=e.startDate?Math.floor(((new Date()-new Date(e.startDate))%31536e6)/2592e6):0;
+    const tenure=years>0?`${years} năm ${months} tháng`:months>0?`${months} tháng`:'Mới vào';
+    const totalPay=(e.baseSalary||0)+(e.allowance||0)+(e.kpiBonus||0);
+    return`<div class="emp-card">
+      <div class="emp-av">${e.name.split(' ').slice(-2).map(w=>w[0]).join('').toUpperCase().slice(0,2)}</div>
+      <div style="flex:1;min-width:0">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px">
+          <div>
+            <div class="emp-name">${esc(e.name)}</div>
+            <div class="emp-pos">${esc(e.pos)}</div>
+          </div>
+          <div style="display:flex;gap:6px;align-items:center;flex-shrink:0">
+            <span class="chip" style="background:${statusColor[e.status]}20;color:${statusColor[e.status]}">${statusLabel[e.status]||e.status}</span>
+            <button class="btn-icon btn-sm" onclick="openEmpM('${e.id}')">✏️</button>
+            <button class="btn-icon btn-sm" onclick="delEmp('${e.id}')">🗑️</button>
+          </div>
+        </div>
+        <div class="emp-meta" style="margin-bottom:8px">
+          <span>🏢 ${esc(e.dept)}</span>
+          <span>📅 ${esc(e.startDate?fmtD(e.startDate):'—')} · ${tenure}</span>
+          <span>📞 ${esc(e.phone||'—')}</span>
+          <span>✉️ ${esc(e.email||'—')}</span>
+        </div>
+        ${e.achieve?`<div style="font-size:12px;color:var(--muted);background:var(--bg);border-radius:8px;padding:8px 10px;margin-bottom:8px;line-height:1.6;border-left:3px solid var(--primary)">🏆 ${esc(e.achieve)}</div>`:''}
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+          <div id="sal-${e.id}" class="emp-salary-blurred" style="font-size:13px;font-weight:700;color:var(--primary-dark)">
+            💰 ${fmt(totalPay)}/tháng
+            ${e.commission==='yes'?`<span class="chip chip-orange" style="font-size:11px;margin-left:4px">+ HH bậc thang</span>`:''}
+          </div>
+          <div id="bank-${e.id}" class="emp-salary-blurred" style="font-size:12px;color:var(--muted)">
+            🏦 ${esc(e.bank||'Chưa cập nhật')}
+          </div>
+          <button class="btn btn-sm btn-ghost" onclick="toggleSalary('${e.id}')" id="btn-sal-${e.id}">👁 Xem lương</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('')||`<div style="text-align:center;padding:48px;color:var(--muted)">Không tìm thấy nhân viên</div>`;
+
+  document.getElementById('employees').innerHTML=`
+  <div class="stats" style="grid-template-columns:repeat(4,1fr);margin-bottom:18px">
+    <div class="stat-card"><div class="stat-icon">👥</div><div class="stat-label">Đang làm việc</div><div class="stat-value">${active}</div><div class="stat-delta">/ ${DB.employees.length} tổng</div></div>
+    <div class="stat-card"><div class="stat-icon">🏢</div><div class="stat-label">Phòng ban</div><div class="stat-value">${deptCount}</div><div class="stat-delta">${[...new Set(DB.employees.filter(e=>e.status==='active').map(e=>e.dept))].join(', ').slice(0,30)}</div></div>
+    <div class="stat-card"><div class="stat-icon">💰</div><div class="stat-label">Quỹ lương/tháng</div><div class="stat-value" style="font-size:18px;filter:blur(6px)" id="stat-salary-total">${fmtBig(totalSalary)}</div><div class="stat-delta"><button class="btn btn-sm btn-ghost" onclick="requirePin(()=>{document.getElementById('stat-salary-total').style.filter='none'})" style="font-size:11px;padding:2px 8px">👁 Xem</button></div></div>
+    <div class="stat-card"><div class="stat-icon">🏆</div><div class="stat-label">Sales có HH bậc thang</div><div class="stat-value">${DB.employees.filter(e=>e.commission==='yes'&&e.status==='active').length}</div><div class="stat-delta">&lt;10tr:1% · 10-20tr:2% · &gt;20tr:3%</div></div>
+  </div>
+  <div class="card">
+    <div class="filter-bar">
+      <div class="search-wrap"><span class="search-ico">🔍</span><input type="text" placeholder="Tên, chức vụ..." value="${esc(empF.s)}" oninput="empF.s=this.value;rEmployees()"></div>
+      <select onchange="empF.dept=this.value;rEmployees()"><option value="">Tất cả phòng ban</option>${depts.map(d=>`<option value="${esc(d)}" ${empF.dept===d?'selected':''}>${esc(d)}</option>`).join('')}</select>
+      <span style="font-size:12px;color:var(--muted)">${list.length} nhân viên</span>
+    </div>
+    <div style="padding:16px;display:flex;flex-direction:column;gap:12px">${cards}</div>
+  </div>`;
+}
+
+let salRevealed={};
+function toggleSalary(eid){
+  if(salRevealed[eid]){
+    document.getElementById('sal-'+eid).classList.add('emp-salary-blurred');
+    document.getElementById('bank-'+eid).classList.add('emp-salary-blurred');
+    document.getElementById('btn-sal-'+eid).textContent='👁 Xem lương';
+    salRevealed[eid]=false;
+  } else {
+    requirePin(()=>{
+      document.getElementById('sal-'+eid).classList.remove('emp-salary-blurred');
+      document.getElementById('bank-'+eid).classList.remove('emp-salary-blurred');
+      document.getElementById('btn-sal-'+eid).textContent='🙈 Ẩn';
+      salRevealed[eid]=true;
+    });
+  }
+}
+
+function openEmpM(id=null){
+  eid=id;const e=id?DB.employees.find(x=>x.id===id):{};
+  document.getElementById('me-ttl').textContent=id?'Sửa hồ sơ nhân viên':'Thêm nhân viên mới';
+  document.getElementById('me-name').value=e.name||'';
+  document.getElementById('me-pos').value=e.pos||'';
+  document.getElementById('me-dept').value=e.dept||'Kinh doanh';
+  document.getElementById('me-email').value=e.email||'';
+  document.getElementById('me-phone').value=e.phone||'';
+  document.getElementById('me-start').value=e.startDate||td();
+  document.getElementById('me-status').value=e.status||'active';
+  document.getElementById('me-bank').value=e.bank||'';
+  document.getElementById('me-base').value=e.baseSalary||0;
+  document.getElementById('me-allow').value=e.allowance||0;
+  document.getElementById('me-kpi').value=e.kpiBonus||0;
+  document.getElementById('me-comm').value=e.commission||'yes';
+  document.getElementById('me-achieve').value=e.achieve||'';
+  openM('m-emp');
+}
+function saveEmp(){
+  const name=document.getElementById('me-name').value.trim();
+  if(!name){toast('Nhập tên nhân viên','error');return;}
+  const data={name,pos:document.getElementById('me-pos').value.trim(),dept:document.getElementById('me-dept').value,email:document.getElementById('me-email').value.trim(),phone:document.getElementById('me-phone').value.trim(),startDate:document.getElementById('me-start').value,status:document.getElementById('me-status').value,bank:document.getElementById('me-bank').value.trim(),baseSalary:+document.getElementById('me-base').value||0,allowance:+document.getElementById('me-allow').value||0,kpiBonus:+document.getElementById('me-kpi').value||0,commission:document.getElementById('me-comm').value,achieve:document.getElementById('me-achieve').value.trim()};
+  if(eid){const i=DB.employees.findIndex(x=>x.id===eid);DB.employees[i]={...DB.employees[i],...data};toast('Đã cập nhật ✅');}
+  else{DB.employees.push({id:gid(),code:'NV'+String(DB.employees.length+1).padStart(3,'0'),...data});toast('Đã thêm ✅');}
+  save();closeM('m-emp');salRevealed={};rEmployees();
+}
+function delEmp(id){const e=DB.employees.find(x=>x.id===id);cfm('Xóa nhân viên','Xóa hồ sơ '+e.name+'?',()=>{DB.employees=DB.employees.filter(x=>x.id!==id);save();toast('Đã xóa','info');rEmployees();});}
+
+// ═══════ ACCOUNTING ═══════
+let finTab='transactions',finMonth='';
+function rAccounting(){
+  document.getElementById('pg-actions').innerHTML=`<button class="btn btn-primary" onclick="openFinM()">＋ Ghi giao dịch</button>`;
+  // Month filter default = current month
+  if(!finMonth){const n=new Date();finMonth=`${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,'0')}`;}
+  const tabHTML=`<div class="tab-bar">
+    <button class="tab-btn ${finTab==='transactions'?'active':''}" onclick="finTab='transactions';rAccounting()">📋 Giao dịch</button>
+    <button class="tab-btn ${finTab==='pl'?'active':''}" onclick="finTab='pl';rAccounting()">📊 P&L Tháng</button>
+    <button class="tab-btn ${finTab==='budget'?'active':''}" onclick="finTab='budget';rAccounting()">🎯 Ngân sách</button>
+    <button class="tab-btn ${finTab==='cashflow'?'active':''}" onclick="finTab='cashflow';rAccounting()">💧 Dòng tiền</button>
+  </div>`;
+
+  // Compute totals for current month
+  const [yr,mo]=(finMonth||'').split('-').map(Number);
+  const monthEntries=DB.finance.filter(f=>{const d=new Date(f.date);return d.getFullYear()===yr&&d.getMonth()+1===mo;});
+  const totalThu=monthEntries.filter(f=>f.type==='thu').reduce((s,f)=>s+f.amt,0);
+  const totalChi=monthEntries.filter(f=>f.type==='chi').reduce((s,f)=>s+f.amt,0);
+  const loiNhuan=totalThu-totalChi;
+  const allThu=DB.finance.filter(f=>f.type==='thu').reduce((s,f)=>s+f.amt,0);
+  const allChi=DB.finance.filter(f=>f.type==='chi').reduce((s,f)=>s+f.amt,0);
+
+  const statsHTML=`<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px">
+    <div class="fin-stat green"><div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">THU tháng ${mo}/${yr}</div><div style="font-size:22px;font-weight:700;color:var(--green)">${fmtBig(totalThu)}</div></div>
+    <div class="fin-stat red"><div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">CHI tháng ${mo}/${yr}</div><div style="font-size:22px;font-weight:700;color:var(--red)">${fmtBig(totalChi)}</div></div>
+    <div class="fin-stat ${loiNhuan>=0?'green':'red'}"><div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">LỢI NHUẬN tháng ${mo}/${yr}</div><div style="font-size:22px;font-weight:700;color:${loiNhuan>=0?'var(--green)':'var(--red)'}">${loiNhuan>=0?'+':''}${fmtBig(loiNhuan)}</div></div>
+    <div class="fin-stat blue"><div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">SỐ DƯ LUỸ KẾ</div><div style="font-size:22px;font-weight:700;color:var(--blue)">${fmtBig(allThu-allChi)}</div></div>
+  </div>`;
+
+  let bodyHTML='';
+  if(finTab==='transactions'){
+    const list=DB.finance.filter(f=>{if(!finMonth)return true;const d=new Date(f.date);return d.getFullYear()===yr&&d.getMonth()+1===mo;}).slice().sort((a,b)=>new Date(b.date)-new Date(a.date));
+    const catLabel={'ban-hang':'Bán hàng/Thu nợ','nhap-hang':'Nhập hàng/Kho','luong':'Lương & Thưởng','van-hanh':'Vận hành','khac':'Khác'};
+    const rows=list.map(f=>`<tr>
+      <td>${fmtD(f.date)}</td>
+      <td><span class="chip ${f.type==='thu'?'chip-green':'chip-red'}">${f.type==='thu'?'💚 THU':'🔴 CHI'}</span></td>
+      <td><span class="chip chip-gray" style="font-size:11px">${catLabel[f.cat]||f.cat}</span></td>
+      <td style="font-weight:700;color:${f.type==='thu'?'var(--green)':'var(--red)'}">${f.type==='thu'?'+':'−'}${fmt(f.amt)}</td>
+      <td style="font-size:12px">${esc(f.desc||'—')}</td>
+      <td style="font-size:11px;color:var(--muted)">${esc(f.ref||'—')}</td>
+      <td><button class="btn-icon btn-sm" onclick="delFin('${f.id}')">🗑️</button></td>
+    </tr>`).join('')||'<tr class="empty-row"><td colspan="7">Không có giao dịch nào tháng này</td></tr>';
+    bodyHTML=`<div class="card">
+      <div class="filter-bar">
+        <label style="font-size:12px;font-weight:600">Tháng:</label>
+        <input type="month" class="form-control" style="width:auto" value="${finMonth}" onchange="finMonth=this.value;rAccounting()">
+        <button class="btn btn-sm btn-ghost" onclick="finMonth='';rAccounting()">Tất cả</button>
+        <span style="font-size:12px;color:var(--muted)">${list.length} giao dịch</span>
+      </div>
+      <div class="tbl-wrap"><table><thead><tr><th>Ngày</th><th>Loại</th><th>Danh mục</th><th>Số tiền</th><th>Nội dung</th><th>Tham chiếu</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>
+    </div>`;
+  } else if(finTab==='pl'){
+    bodyHTML=buildPL();
+  } else if(finTab==='budget'){
+    bodyHTML=buildBudget();
+  } else if(finTab==='cashflow'){
+    bodyHTML=buildCashflow();
+  }
+  document.getElementById('accounting').innerHTML=statsHTML+tabHTML+bodyHTML;
+  if(finTab==='cashflow')setTimeout(renderCashflowChart,80);
+  if(finTab==='pl')setTimeout(renderPLChart,80);
+}
+
+function buildPL(){
+  const now=new Date();
+  const months=[];
+  for(let i=5;i>=0;i--){const d=new Date(now.getFullYear(),now.getMonth()-i,1);months.push({yr:d.getFullYear(),mo:d.getMonth()+1,label:`T${d.getMonth()+1}/${d.getFullYear().toString().slice(2)}` });}
+  const catLabel={'ban-hang':'Bán hàng','nhap-hang':'Nhập hàng','luong':'Lương & Thưởng','van-hanh':'Vận hành','khac':'Khác'};
+  const catColors={'ban-hang':'chip-green','nhap-hang':'chip-blue','luong':'chip-amber','van-hanh':'chip-orange','khac':'chip-gray'};
+  const rows=months.map(m=>{
+    const ents=DB.finance.filter(f=>{const d=new Date(f.date);return d.getFullYear()===m.yr&&d.getMonth()+1===m.mo;});
+    const thu=ents.filter(f=>f.type==='thu').reduce((s,f)=>s+f.amt,0);
+    const chi=ents.filter(f=>f.type==='chi').reduce((s,f)=>s+f.amt,0);
+    const ln=thu-chi;
+    const margin=thu>0?Math.round(ln/thu*100):0;
+    return`<tr>
+      <td style="font-weight:700">${m.label}</td>
+      <td style="font-weight:700;color:var(--green)">${fmtBig(thu)}</td>
+      <td style="color:var(--red)">${fmtBig(ents.filter(f=>f.type==='chi'&&f.cat==='nhap-hang').reduce((s,f)=>s+f.amt,0))}</td>
+      <td style="color:var(--amber)">${fmtBig(ents.filter(f=>f.type==='chi'&&f.cat==='luong').reduce((s,f)=>s+f.amt,0))}</td>
+      <td style="color:var(--muted)">${fmtBig(ents.filter(f=>f.type==='chi'&&f.cat==='van-hanh').reduce((s,f)=>s+f.amt,0))}</td>
+      <td style="font-weight:700;color:var(--red)">${fmtBig(chi)}</td>
+      <td style="font-weight:700;font-size:15px;color:${ln>=0?'var(--green)':'var(--red)'}">${ln>=0?'+':''}${fmtBig(ln)}</td>
+      <td><span class="chip ${margin>=20?'chip-green':margin>=5?'chip-amber':'chip-red'}">${margin}%</span></td>
+    </tr>`;
+  }).join('');
+  const totThu=DB.finance.filter(f=>f.type==='thu').reduce((s,f)=>s+f.amt,0);
+  const totChi=DB.finance.filter(f=>f.type==='chi').reduce((s,f)=>s+f.amt,0);
+  return`<div class="card" style="margin-bottom:18px">
+    <div class="card-header"><div class="card-title">📊 Báo cáo P&L — 6 tháng gần nhất</div></div>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Tháng</th><th style="color:var(--green)">Doanh thu</th><th>Chi nhập hàng</th><th>Chi lương</th><th>Chi vận hành</th><th style="color:var(--red)">Tổng chi</th><th>Lợi nhuận</th><th>Biên LN</th></tr></thead>
+      <tbody>${rows}</tbody>
+      <tfoot><tr style="background:var(--bg);font-weight:700"><td>TỔNG</td><td style="color:var(--green)">${fmtBig(totThu)}</td><td colspan="3" style="color:var(--muted)"></td><td style="color:var(--red)">${fmtBig(totChi)}</td><td style="color:${totThu-totChi>=0?'var(--green)':'var(--red)'}">${fmtBig(totThu-totChi)}</td><td><span class="chip ${totThu>0&&(totThu-totChi)/totThu>=0.2?'chip-green':'chip-amber'}">${totThu>0?Math.round((totThu-totChi)/totThu*100):0}%</span></td></tr></tfoot>
+    </table></div>
+  </div>
+  <div class="card"><div class="card-header"><div class="card-title">📈 Biểu đồ lợi nhuận 6 tháng</div></div>
+    <div style="padding:16px;height:240px"><canvas id="chart-pl"></canvas></div>
+  </div>`;
+}
+
+function buildBudget(){
+  const now=new Date();const mo=now.getMonth()+1;const yr=now.getFullYear();
+  const ents=DB.finance.filter(f=>{const d=new Date(f.date);return d.getFullYear()===yr&&d.getMonth()+1===mo;});
+  const actThu=ents.filter(f=>f.type==='thu').reduce((s,f)=>s+f.amt,0);
+  const actNhapHang=ents.filter(f=>f.cat==='nhap-hang').reduce((s,f)=>s+f.amt,0);
+  const actLuong=ents.filter(f=>f.cat==='luong').reduce((s,f)=>s+f.amt,0);
+  const actVanHanh=ents.filter(f=>f.cat==='van-hanh').reduce((s,f)=>s+f.amt,0);
+  const bgt=DB.budget||{rev:80000000,nhapHang:30000000,luong:50000000,vanHanh:5000000};
+  const pct=(act,plan)=>plan>0?Math.min(100,Math.round(act/plan*100)):0;
+  const bar=(act,plan)=>{const p=pct(act,plan);const c=p>=100?'var(--red)':p>=80?'var(--amber)':'var(--green)';return`<div style="flex:1"><div class="prog"><div class="prog-fill" style="width:${p}%;background:${c}"></div></div></div><span style="font-size:12px;font-weight:700;color:${c};min-width:36px">${p}%</span>`;};
+  return`<div class="card">
+    <div class="card-header">
+      <div class="card-title">🎯 Ngân sách tháng ${mo}/${yr}</div>
+      <button class="btn btn-sm btn-ghost" onclick="editBudget()">✏️ Chỉnh ngân sách</button>
+    </div>
+    <div style="padding:0">
+      <div class="budget-row header"><span>Hạng mục</span><span>Kế hoạch</span><span>Thực tế</span><span>Tiến độ</span></div>
+      <div class="budget-row">
+        <span style="font-weight:600;color:var(--green)">💚 Doanh thu</span>
+        <span style="color:var(--muted)">${fmtBig(bgt.rev)}</span>
+        <span style="font-weight:700;color:var(--green)">${fmtBig(actThu)}</span>
+        <div style="display:flex;align-items:center;gap:8px">${bar(actThu,bgt.rev)}</div>
+      </div>
+      <div class="budget-row">
+        <span style="font-weight:600">🔴 Chi nhập hàng</span>
+        <span style="color:var(--muted)">${fmtBig(bgt.nhapHang)}</span>
+        <span style="font-weight:700;color:var(--red)">${fmtBig(actNhapHang)}</span>
+        <div style="display:flex;align-items:center;gap:8px">${bar(actNhapHang,bgt.nhapHang)}</div>
+      </div>
+      <div class="budget-row">
+        <span style="font-weight:600">🔴 Chi lương</span>
+        <span style="color:var(--muted)">${fmtBig(bgt.luong)}</span>
+        <span style="font-weight:700;color:var(--red)">${fmtBig(actLuong)}</span>
+        <div style="display:flex;align-items:center;gap:8px">${bar(actLuong,bgt.luong)}</div>
+      </div>
+      <div class="budget-row">
+        <span style="font-weight:600">🔴 Chi vận hành</span>
+        <span style="color:var(--muted)">${fmtBig(bgt.vanHanh)}</span>
+        <span style="font-weight:700;color:var(--red)">${fmtBig(actVanHanh)}</span>
+        <div style="display:flex;align-items:center;gap:8px">${bar(actVanHanh,bgt.vanHanh)}</div>
+      </div>
+      <div class="budget-row" style="background:var(--primary-light);font-weight:700">
+        <span style="color:var(--primary-dark)">📊 Lợi nhuận ước tính</span>
+        <span style="color:var(--primary-dark)">${fmtBig(bgt.rev-bgt.nhapHang-bgt.luong-bgt.vanHanh)}</span>
+        <span style="color:${actThu-actNhapHang-actLuong-actVanHanh>=0?'var(--green)':'var(--red)'}">
+          ${fmtBig(actThu-actNhapHang-actLuong-actVanHanh)}
+        </span>
+        <span></span>
+      </div>
+    </div>
+  </div>`;
+}
+
+function editBudget(){
+  const bgt=DB.budget||{rev:80000000,nhapHang:30000000,luong:50000000,vanHanh:5000000};
+  document.getElementById('mv-ttl').textContent='✏️ Chỉnh ngân sách tháng';
+  document.getElementById('mv-body').innerHTML=`<div class="form-grid">
+    <div class="form-group full"><label>Mục tiêu Doanh thu (₫)</label><input class="form-control" id="bgt-rev" type="number" value="${bgt.rev}"></div>
+    <div class="form-group"><label>Ngân sách nhập hàng (₫)</label><input class="form-control" id="bgt-nhap" type="number" value="${bgt.nhapHang}"></div>
+    <div class="form-group"><label>Ngân sách lương (₫)</label><input class="form-control" id="bgt-luong" type="number" value="${bgt.luong}"></div>
+    <div class="form-group full"><label>Ngân sách vận hành (₫)</label><input class="form-control" id="bgt-vh" type="number" value="${bgt.vanHanh}"></div>
+  </div>`;
+  document.querySelector('#m-view .modal-foot').innerHTML=`<button class="btn btn-ghost" onclick="closeM('m-view')">Hủy</button><button class="btn btn-primary" onclick="saveBudget()">💾 Lưu</button>`;
+  openM('m-view');
+}
+function saveBudget(){
+  DB.budget={rev:+document.getElementById('bgt-rev').value||0,nhapHang:+document.getElementById('bgt-nhap').value||0,luong:+document.getElementById('bgt-luong').value||0,vanHanh:+document.getElementById('bgt-vh').value||0};
+  save();toast('Đã lưu ngân sách ✅');closeM('m-view');rAccounting();
+}
+
+function buildCashflow(){
+  const now=new Date();
+  const months=[];
+  for(let i=5;i>=0;i--){const d=new Date(now.getFullYear(),now.getMonth()-i,1);months.push({yr:d.getFullYear(),mo:d.getMonth()+1,label:`T${d.getMonth()+1}/${d.getFullYear().toString().slice(2)}`});}
+  let cumulative=0;
+  const rows=months.map(m=>{
+    const ents=DB.finance.filter(f=>{const d=new Date(f.date);return d.getFullYear()===m.yr&&d.getMonth()+1===m.mo;});
+    const thu=ents.filter(f=>f.type==='thu').reduce((s,f)=>s+f.amt,0);
+    const chi=ents.filter(f=>f.type==='chi').reduce((s,f)=>s+f.amt,0);
+    const net=thu-chi;cumulative+=net;
+    return`<tr>
+      <td style="font-weight:700">${m.label}</td>
+      <td style="color:var(--green)">${fmtBig(thu)}</td>
+      <td style="color:var(--red)">${fmtBig(chi)}</td>
+      <td style="font-weight:700;color:${net>=0?'var(--green)':'var(--red)'}">${net>=0?'+':''}${fmtBig(net)}</td>
+      <td style="font-weight:700;color:${cumulative>=0?'var(--blue)':'var(--red)'}">${fmtBig(cumulative)}</td>
+    </tr>`;
+  }).join('');
+  // Forecast next 3 months based on average
+  const allEnts=DB.finance;
+  const avg6Thu=allEnts.filter(f=>f.type==='thu').reduce((s,f)=>s+f.amt,0)/6;
+  const avg6Chi=allEnts.filter(f=>f.type==='chi').reduce((s,f)=>s+f.amt,0)/6;
+  const forecastRows=[1,2,3].map(i=>{
+    const fd=new Date(now.getFullYear(),now.getMonth()+i,1);
+    cumulative+=avg6Thu-avg6Chi;
+    return`<tr style="opacity:.65;font-style:italic">
+      <td>T${fd.getMonth()+1}/${fd.getFullYear().toString().slice(2)} 📈</td>
+      <td style="color:var(--green)">${fmtBig(avg6Thu)}</td>
+      <td style="color:var(--red)">${fmtBig(avg6Chi)}</td>
+      <td style="font-weight:700;color:${avg6Thu-avg6Chi>=0?'var(--green)':'var(--red)'}">${avg6Thu-avg6Chi>=0?'+':''}${fmtBig(avg6Thu-avg6Chi)}</td>
+      <td style="font-weight:700;color:var(--blue)">${fmtBig(cumulative)}</td>
+    </tr>`;
+  }).join('');
+  return`<div class="card" style="margin-bottom:18px">
+    <div class="card-header"><div class="card-title">💧 Dòng tiền 6 tháng + dự báo 3 tháng</div><span style="font-size:12px;color:var(--muted)">Hàng in nghiêng = dự báo theo trung bình</span></div>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Tháng</th><th style="color:var(--green)">Tiền vào</th><th style="color:var(--red)">Tiền ra</th><th>Net</th><th style="color:var(--blue)">Luỹ kế</th></tr></thead>
+      <tbody>${rows}${forecastRows}</tbody>
+    </table></div>
+  </div>
+  <div class="card"><div class="card-header"><div class="card-title">📈 Biểu đồ dòng tiền</div></div>
+    <div style="padding:16px;height:240px"><canvas id="chart-cf"></canvas></div>
+  </div>`;
+}
+
+function openFinM(){
+  document.getElementById('mfin-type').value='thu';
+  updateFinCat();
+  document.getElementById('mfin-amt').value='';
+  document.getElementById('mfin-date').value=td();
+  document.getElementById('mfin-desc').value='';
+  document.getElementById('mfin-ref').value='';
+  document.getElementById('mfin-bank').value='Chuyển khoản';
+  openM('m-fin');
+}
+function updateFinCat(){
+  const t=document.getElementById('mfin-type').value;
+  const cat=document.getElementById('mfin-cat');
+  if(t==='thu'){cat.innerHTML='<option value="ban-hang">Bán hàng / Thu nợ</option><option value="khac">Khác</option>';}
+  else{cat.innerHTML='<option value="nhap-hang">Nhập hàng / Kho</option><option value="luong">Lương & Thưởng</option><option value="van-hanh">Vận hành</option><option value="khac">Khác</option>';}
+}
+function saveFin(){
+  const amt=+document.getElementById('mfin-amt').value||0;
+  if(!amt){toast('Nhập số tiền','error');return;}
+  DB.finance.push({id:gid(),type:document.getElementById('mfin-type').value,cat:document.getElementById('mfin-cat').value,amt,date:document.getElementById('mfin-date').value,desc:document.getElementById('mfin-desc').value.trim(),ref:document.getElementById('mfin-ref').value.trim(),bank:document.getElementById('mfin-bank').value});
+  save();toast('Đã ghi nhận ✅');closeM('m-fin');rAccounting();
+}
+function delFin(id){cfm('Xóa giao dịch','Xóa giao dịch này?',()=>{DB.finance=DB.finance.filter(x=>x.id!==id);save();toast('Đã xóa','info');rAccounting();});}
+
+let _plChart=null,_cfChart=null;
+function renderPLChart(){
+  loadChartJs(()=>{
+    const now=new Date();const months=[];const thData=[];const chiData=[];const lnData=[];
+    for(let i=5;i>=0;i--){const d=new Date(now.getFullYear(),now.getMonth()-i,1);months.push(`T${d.getMonth()+1}/${d.getFullYear().toString().slice(2)}`);
+      const ents=DB.finance.filter(f=>{const fd=new Date(f.date);return fd.getFullYear()===d.getFullYear()&&fd.getMonth()===d.getMonth();});
+      const thu=ents.filter(f=>f.type==='thu').reduce((s,f)=>s+f.amt,0);
+      const chi=ents.filter(f=>f.type==='chi').reduce((s,f)=>s+f.amt,0);
+      thData.push(Math.round(thu/1e6));chiData.push(Math.round(chi/1e6));lnData.push(Math.round((thu-chi)/1e6));
+    }
+    if(_plChart){_plChart.destroy();_plChart=null;}
+    const ctx=document.getElementById('chart-pl');if(!ctx)return;
+    _plChart=new Chart(ctx,{type:'bar',data:{labels:months,datasets:[{label:'Thu (tr₫)',data:thData,backgroundColor:'rgba(16,185,129,.75)',borderRadius:4},{label:'Chi (tr₫)',data:chiData,backgroundColor:'rgba(239,68,68,.65)',borderRadius:4},{label:'LN (tr₫)',data:lnData,backgroundColor:'rgba(59,130,246,.75)',borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:11}}}},scales:{y:{ticks:{callback:v=>v+'M'},grid:{color:'rgba(0,0,0,.05)'}},x:{grid:{display:false}}}}});
+  });
+}
+function renderCashflowChart(){
+  loadChartJs(()=>{
+    const now=new Date();const labels=[];const inData=[];const outData=[];const cumData=[];let cum=0;
+    for(let i=5;i>=0;i--){const d=new Date(now.getFullYear(),now.getMonth()-i,1);labels.push(`T${d.getMonth()+1}/${d.getFullYear().toString().slice(2)}`);
+      const ents=DB.finance.filter(f=>{const fd=new Date(f.date);return fd.getFullYear()===d.getFullYear()&&fd.getMonth()===d.getMonth();});
+      const thu=ents.filter(f=>f.type==='thu').reduce((s,f)=>s+f.amt,0);
+      const chi=ents.filter(f=>f.type==='chi').reduce((s,f)=>s+f.amt,0);
+      cum+=thu-chi;inData.push(Math.round(thu/1e6));outData.push(Math.round(chi/1e6));cumData.push(Math.round(cum/1e6));
+    }
+    if(_cfChart){_cfChart.destroy();_cfChart=null;}
+    const ctx=document.getElementById('chart-cf');if(!ctx)return;
+    _cfChart=new Chart(ctx,{type:'bar',data:{labels,datasets:[{label:'Tiền vào (tr₫)',data:inData,backgroundColor:'rgba(16,185,129,.7)',borderRadius:4},{label:'Tiền ra (tr₫)',data:outData,backgroundColor:'rgba(239,68,68,.6)',borderRadius:4},{type:'line',label:'Luỹ kế (tr₫)',data:cumData,borderColor:'#3B82F6',backgroundColor:'rgba(59,130,246,.1)',tension:.3,fill:true,pointRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:11}}}},scales:{y:{ticks:{callback:v=>v+'M'},grid:{color:'rgba(0,0,0,.05)'}},x:{grid:{display:false}}}}});
   });
 }
 
