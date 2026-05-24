@@ -226,6 +226,61 @@ textarea.form-control{resize:vertical;min-height:72px}
 .cat-tab{padding:7px 14px;border:1px solid var(--border);border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;background:var(--card);color:var(--muted);transition:all .15s;white-space:nowrap}
 .cat-tab:hover,.cat-tab.active{background:var(--primary);color:#fff;border-color:var(--primary)}
 @media(max-width:768px){.lib-grid{grid-template-columns:1fr}}
+/* ── Settings ── */
+.set-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:22px 24px;margin-bottom:16px}
+.set-card h3{font-size:14px;font-weight:700;margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px}
+.set-row{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border);gap:16px}
+.set-row:last-child{border-bottom:none;padding-bottom:0}
+.set-label{font-size:13px;font-weight:600}
+.set-sub{font-size:11px;color:var(--muted);margin-top:2px}
+.toggle{position:relative;width:44px;height:24px;flex-shrink:0}
+.toggle input{opacity:0;width:0;height:0;position:absolute}
+.toggle-slider{position:absolute;inset:0;background:#D1D5DB;border-radius:24px;cursor:pointer;transition:.3s}
+.toggle-slider::before{content:'';position:absolute;width:18px;height:18px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:.3s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.toggle input:checked+.toggle-slider{background:var(--primary)}
+.toggle input:checked+.toggle-slider::before{transform:translateX(20px)}
+/* ── Em Tèo Chatbot ── */
+#teo-btn{position:fixed;bottom:24px;right:24px;width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--primary-darker));border:none;cursor:pointer;box-shadow:0 4px 18px rgba(249,115,22,.45);z-index:1000;display:flex;align-items:center;justify-content:center;font-size:26px;transition:transform .2s,box-shadow .2s}
+#teo-btn:hover{transform:scale(1.1);box-shadow:0 6px 24px rgba(249,115,22,.6)}
+.teo-pulse{position:absolute;inset:0;border-radius:50%;background:rgba(249,115,22,.3);animation:teoPulse 2.5s infinite;pointer-events:none}
+@keyframes teoPulse{0%,100%{transform:scale(1);opacity:.8}60%{transform:scale(1.35);opacity:0}}
+#teo-win{position:fixed;bottom:92px;right:24px;width:360px;height:520px;background:var(--card);border-radius:20px;box-shadow:0 8px 40px rgba(0,0,0,.2);z-index:1000;display:flex;flex-direction:column;transform:scale(.85) translateY(24px);opacity:0;pointer-events:none;transition:all .25s cubic-bezier(.34,1.56,.64,1);transform-origin:bottom right;border:1px solid var(--border)}
+#teo-win.open{transform:scale(1) translateY(0);opacity:1;pointer-events:auto}
+.teo-head{padding:14px 16px;background:linear-gradient(135deg,var(--primary),var(--primary-darker));border-radius:20px 20px 0 0;display:flex;align-items:center;gap:10px;flex-shrink:0}
+.teo-av{width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,.22);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+.teo-name{font-weight:700;color:#fff;font-size:14px;line-height:1.2}
+.teo-status{font-size:10px;color:rgba(255,255,255,.85);margin-top:2px;display:flex;align-items:center;gap:4px}
+.teo-status::before{content:'';width:6px;height:6px;background:#4ADE80;border-radius:50%;display:inline-block}
+.teo-close{margin-left:auto;background:rgba(255,255,255,.18);border:none;color:#fff;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .15s}
+.teo-close:hover{background:rgba(255,255,255,.35)}
+.teo-msgs{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px;scroll-behavior:smooth}
+.teo-msg{max-width:88%;font-size:13px;line-height:1.6}
+.teo-msg.bot{align-self:flex-start}
+.teo-msg.user{align-self:flex-end}
+.teo-bubble{padding:10px 14px;border-radius:18px;word-break:break-word}
+.teo-msg.bot .teo-bubble{background:var(--bg);border:1px solid var(--border);border-top-left-radius:4px;color:var(--text)}
+.teo-msg.user .teo-bubble{background:var(--primary);color:#fff;border-bottom-right-radius:4px}
+.teo-chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:7px}
+.teo-chip{padding:5px 11px;border:1.5px solid var(--primary-border);border-radius:16px;font-size:11px;font-weight:600;cursor:pointer;background:var(--primary-light);color:var(--primary-darker);transition:all .15s;white-space:nowrap}
+.teo-chip:hover{background:var(--primary);color:#fff;border-color:var(--primary)}
+.teo-lib-card{background:var(--primary-light);border:1px solid var(--primary-border);border-radius:10px;padding:9px 12px;margin-top:5px;cursor:pointer;transition:all .15s}
+.teo-lib-card:hover{background:var(--primary)}
+.teo-lib-title{font-size:12px;font-weight:700;color:var(--primary-darker)}
+.teo-lib-card:hover .teo-lib-title{color:#fff}
+.teo-lib-sub{font-size:10px;color:var(--muted);margin-top:2px}
+.teo-lib-card:hover .teo-lib-sub{color:rgba(255,255,255,.8)}
+.teo-typing{display:flex;gap:4px;align-items:center;padding:4px 2px}
+.teo-dot{width:7px;height:7px;border-radius:50%;background:var(--muted);animation:teoTyping 1.2s infinite}
+.teo-dot:nth-child(2){animation-delay:.2s}
+.teo-dot:nth-child(3){animation-delay:.4s}
+@keyframes teoTyping{0%,80%,100%{transform:translateY(0);opacity:.5}40%{transform:translateY(-4px);opacity:1}}
+.teo-foot{padding:10px 12px;border-top:1px solid var(--border);display:flex;gap:8px;flex-shrink:0;background:var(--card);border-radius:0 0 20px 20px}
+.teo-inp{flex:1;padding:8px 14px;border:1px solid var(--border);border-radius:20px;font-size:13px;outline:none;background:var(--bg);transition:border-color .15s}
+.teo-inp:focus{border-color:var(--primary);background:#fff}
+.teo-send{width:36px;height:36px;border-radius:50%;background:var(--primary);color:#fff;border:none;cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .15s}
+.teo-send:hover{background:var(--primary-dark)}
+#teo-badge{position:absolute;top:-3px;right:-3px;background:var(--red);color:#fff;font-size:9px;font-weight:700;width:17px;height:17px;border-radius:50%;display:none;align-items:center;justify-content:center;border:2px solid #fff}
+@media(max-width:768px){#teo-win{width:calc(100vw - 32px);right:16px;bottom:82px;height:470px}#teo-btn{bottom:16px;right:16px}}
 </style>
 </head>
 <body>
@@ -258,6 +313,7 @@ textarea.form-control{resize:vertical;min-height:72px}
     <div class="nav-sec">Doanh nghiệp</div>
     <div class="nav-item" data-page="employees" onclick="nav(this)"><span class="ni">👥</span> Nhân viên <span class="badge" id="badge-emp">0</span></div>
     <div class="nav-item" data-page="company" onclick="nav(this)"><span class="ni">🏢</span> Công ty</div>
+    <div class="nav-item" data-page="settings" onclick="nav(this)"><span class="ni">⚙️</span> Cài đặt</div>
   </nav>
 </aside>
 <main class="main" id="main">
@@ -286,6 +342,7 @@ textarea.form-control{resize:vertical;min-height:72px}
   <div id="accounting" class="page"></div>
   <div id="employees" class="page"></div>
   <div id="company" class="page"></div>
+  <div id="settings" class="page"></div>
 </main>
 
 <!-- Customer Modal -->
@@ -549,6 +606,28 @@ textarea.form-control{resize:vertical;min-height:72px}
 <!-- Confirm -->
 <div id="cfm-bg"><div class="cfm-box"><h3 id="cfm-ttl">Xác nhận</h3><p id="cfm-msg"></p><div class="cfm-btns"><button class="btn btn-ghost" onclick="closeCfm()">Hủy</button><button class="btn btn-danger" id="cfm-ok">Xóa</button></div></div></div>
 <div id="toast-wrap"></div>
+
+<!-- Em Tèo Chatbot -->
+<button id="teo-btn" onclick="toggleTeo()" title="Chat với Em Tèo — Trợ lý AI" style="display:flex">
+  <div class="teo-pulse"></div>
+  🤖
+  <div id="teo-badge"></div>
+</button>
+<div id="teo-win">
+  <div class="teo-head">
+    <div class="teo-av">🤖</div>
+    <div>
+      <div class="teo-name">Em Tèo</div>
+      <div class="teo-status">Sẵn sàng hỗ trợ bạn</div>
+    </div>
+    <button class="teo-close" onclick="toggleTeo()">✕</button>
+  </div>
+  <div class="teo-msgs" id="teo-msgs"></div>
+  <div class="teo-foot">
+    <input class="teo-inp" id="teo-inp" placeholder="Hỏi Em Tèo bất cứ điều gì..." onkeydown="if(event.key==='Enter')teoSend()">
+    <button class="teo-send" onclick="teoSend()" title="Gửi">▶</button>
+  </div>
+</div>
 
 <script>
 const SK='medcrm_v4';
@@ -831,8 +910,8 @@ function toggleSB(){
 function closeSB(){sbOn=false;document.getElementById('sidebar').classList.remove('open');document.getElementById('overlay').classList.remove('on');}
 
 // ── Nav ──
-const PM={dashboard:{t:'Dashboard',s:''},customers:{t:'Danh sách khách hàng',s:'CRM'},regions:{t:'Khách hàng theo khu vực',s:'Phân bố địa lý'},products:{t:'Sản phẩm & Vật tư',s:'Danh mục'},quotes:{t:'Báo giá',s:''},orders:{t:'Đơn hàng',s:''},inventory:{t:'Kho hàng',s:'Nhập / Xuất / Tồn'},followup:{t:'Follow-up',s:'Lịch liên hệ'},debt:{t:'Công nợ',s:'Thanh toán'},kpi:{t:'KPI Nhân viên Sales',s:'Hiệu suất bán hàng'},library:{t:'Thư viện kiến thức',s:'Kỹ năng · Chốt đơn · Tình huống · Chiến thuật'},accounting:{t:'Kế toán',s:'Thu Chi · P&L · Ngân sách · Dòng tiền'},employees:{t:'Nhân viên',s:'Hồ sơ · Lương bổng · Thành tích'},company:{t:'Hồ sơ Công ty',s:'Tầm nhìn · Chiến lược · Văn hóa'}};
-const PFN={dashboard:rDash,customers:rCust,regions:rRegions,products:rProd,quotes:rQuotes,orders:rOrders,inventory:rInv,followup:rFU,debt:rDebt,kpi:rKPI,library:rLibrary,accounting:rAccounting,employees:rEmployees,company:rCompany};
+const PM={dashboard:{t:'Dashboard',s:''},customers:{t:'Danh sách khách hàng',s:'CRM'},regions:{t:'Khách hàng theo khu vực',s:'Phân bố địa lý'},products:{t:'Sản phẩm & Vật tư',s:'Danh mục'},quotes:{t:'Báo giá',s:''},orders:{t:'Đơn hàng',s:''},inventory:{t:'Kho hàng',s:'Nhập / Xuất / Tồn'},followup:{t:'Follow-up',s:'Lịch liên hệ'},debt:{t:'Công nợ',s:'Thanh toán'},kpi:{t:'KPI Nhân viên Sales',s:'Hiệu suất bán hàng'},library:{t:'Thư viện kiến thức',s:'Kỹ năng · Chốt đơn · Tình huống · Chiến thuật'},accounting:{t:'Kế toán',s:'Thu Chi · P&L · Ngân sách · Dòng tiền'},employees:{t:'Nhân viên',s:'Hồ sơ · Lương bổng · Thành tích'},company:{t:'Hồ sơ Công ty',s:'Tầm nhìn · Chiến lược · Văn hóa'},settings:{t:'Cài đặt',s:'Hệ thống · Bảo mật · Dữ liệu · Em Tèo'}};
+const PFN={dashboard:rDash,customers:rCust,regions:rRegions,products:rProd,quotes:rQuotes,orders:rOrders,inventory:rInv,followup:rFU,debt:rDebt,kpi:rKPI,library:rLibrary,accounting:rAccounting,employees:rEmployees,company:rCompany,settings:rSettings};
 
 function nav(el){
   const p=el.dataset.page;
@@ -2897,6 +2976,289 @@ function delLib(id){
   });
 }
 
+// ═══════ SETTINGS ═══════
+let settTab='general';
+function rSettings(){
+  document.getElementById('pg-actions').innerHTML='';
+  const tabs=[{v:'general',l:'⚙️ Chung'},{v:'security',l:'🔒 Bảo mật'},{v:'data',l:'🗄️ Dữ liệu'},{v:'chatbot',l:'🤖 Em Tèo'}];
+  const tabBar=`<div class="tab-bar" style="margin-bottom:20px">${tabs.map(t=>`<button class="tab-btn${settTab===t.v?' active':''}" onclick="settTab='${t.v}';rSettings()">${t.l}</button>`).join('')}</div>`;
+  let body='';
+  if(settTab==='general'){
+    const c=DB.company||{};
+    body=`
+    <div class="set-card">
+      <h3>🏢 Thông tin công ty</h3>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+        <div class="form-group"><label>Tên công ty đầy đủ</label><input class="form-control" id="set-cname" value="${esc(c.name||'')}" placeholder="Công ty TNHH Vật Tư Y Tế"></div>
+        <div class="form-group"><label>Tên viết tắt / Thương hiệu</label><input class="form-control" id="set-csname" value="${esc(c.shortName||'')}" placeholder="Anh Sáng Y Tế"></div>
+        <div class="form-group"><label>Năm thành lập</label><input class="form-control" id="set-cfounded" value="${esc(c.founded||'')}" placeholder="2010"></div>
+        <div class="form-group"><label>Slogan công ty</label><input class="form-control" id="set-ctag" value="${esc(c.tagline||'')}" placeholder="Đồng hành cùng sức khỏe cộng đồng"></div>
+      </div>
+      <div style="margin-top:14px;text-align:right"><button class="btn btn-primary" onclick="saveSetGeneral()">💾 Lưu thay đổi</button></div>
+    </div>
+    <div class="set-card">
+      <h3>🖥️ Giao diện & Hiển thị</h3>
+      <div class="set-row">
+        <div><div class="set-label">Badge số lượng trên sidebar</div><div class="set-sub">Hiển thị số pending trên từng mục menu</div></div>
+        <label class="toggle"><input type="checkbox" ${(DB.settings||{}).showBadges!==false?'checked':''} onchange="saveSetting('showBadges',this.checked)"><span class="toggle-slider"></span></label>
+      </div>
+      <div class="set-row">
+        <div><div class="set-label">Chatbot Em Tèo</div><div class="set-sub">Hiển thị nút chat tư vấn ở góc phải màn hình</div></div>
+        <label class="toggle"><input type="checkbox" ${(DB.settings||{}).showTeo!==false?'checked':''} onchange="saveSetting('showTeo',this.checked);toggleTeoBtn()"><span class="toggle-slider"></span></label>
+      </div>
+    </div>`;
+  }else if(settTab==='security'){
+    body=`
+    <div class="set-card">
+      <h3>🔒 Mật khẩu HR (xem lương & tài khoản ngân hàng)</h3>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:18px;line-height:1.7">Mật khẩu này bảo vệ thông tin nhạy cảm: lương nhân viên và tài khoản ngân hàng.<br>Chỉ chủ công ty mới nên biết mật khẩu này.</p>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px">
+        <div class="form-group"><label>Mật khẩu hiện tại</label><input type="password" class="form-control" id="set-curpin" placeholder="••••••"></div>
+        <div class="form-group"><label>Mật khẩu mới</label><input type="password" class="form-control" id="set-newpin" placeholder="Tối thiểu 4 ký tự"></div>
+        <div class="form-group"><label>Xác nhận mật khẩu mới</label><input type="password" class="form-control" id="set-cfmpin" placeholder="Nhập lại"></div>
+      </div>
+      <div style="margin-top:14px;text-align:right"><button class="btn btn-primary" onclick="saveSetPin()">🔐 Đổi mật khẩu</button></div>
+    </div>
+    <div class="set-card">
+      <h3>🛡️ Trạng thái phiên làm việc</h3>
+      <div class="set-row">
+        <div><div class="set-label">HR PIN phiên này</div><div class="set-sub">Sau khi mở khoá, bạn có thể xem lương & ngân hàng trong phiên hiện tại</div></div>
+        <span class="chip ${pinUnlocked?'chip-green':'chip-amber'}">${pinUnlocked?'✅ Đã mở khoá':'🔒 Chưa mở khoá'}</span>
+      </div>
+      ${pinUnlocked?`<div style="margin-top:12px;text-align:right"><button class="btn btn-danger btn-sm" onclick="pinUnlocked=false;toast('Đã khoá lại HR PIN','info');rSettings()">🔒 Khoá lại ngay</button></div>`:''}
+    </div>`;
+  }else if(settTab==='data'){
+    const cnt={c:DB.customers.length,p:DB.products.length,o:DB.orders.length,l:DB.library.length,e:DB.employees.length,f:DB.finance.length};
+    body=`
+    <div class="set-card">
+      <h3>📊 Tổng quan dữ liệu hiện tại</h3>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">
+        ${[['👥',cnt.c,'Khách hàng','var(--primary)'],['💊',cnt.p,'Sản phẩm','var(--green)'],['🛒',cnt.o,'Đơn hàng','var(--blue)'],['👨‍💼',cnt.e,'Nhân viên','var(--amber)'],['📒',cnt.f,'Giao dịch TC','#8B5CF6'],['📚',cnt.l,'Bài học','#EC4899']].map(([ic,n,lb,cl])=>`<div style="text-align:center;padding:16px 12px;background:var(--bg);border-radius:12px"><div style="font-size:22px;margin-bottom:4px">${ic}</div><div style="font-size:24px;font-weight:700;color:${cl}">${n}</div><div style="font-size:11px;color:var(--muted);margin-top:2px">${lb}</div></div>`).join('')}
+      </div>
+    </div>
+    <div class="set-card">
+      <h3>💾 Sao lưu & Khôi phục</h3>
+      <div class="set-row">
+        <div><div class="set-label">Sao lưu toàn bộ dữ liệu</div><div class="set-sub">Tải file JSON về máy — có thể dùng để khôi phục sau này</div></div>
+        <button class="btn btn-ghost btn-sm" onclick="backupData()">💾 Tải về máy</button>
+      </div>
+      <div class="set-row">
+        <div><div class="set-label">Khôi phục từ file sao lưu</div><div class="set-sub">Upload file JSON đã sao lưu trước để khôi phục dữ liệu</div></div>
+        <label class="btn btn-ghost btn-sm" style="cursor:pointer">📂 Chọn file<input type="file" accept=".json" style="display:none" onchange="restoreData(this)"></label>
+      </div>
+    </div>
+    <div class="set-card" style="border-color:var(--red-bd)">
+      <h3 style="color:var(--red)">⚠️ Vùng nguy hiểm</h3>
+      <div class="set-row">
+        <div><div class="set-label">Xoá toàn bộ dữ liệu</div><div class="set-sub" style="color:var(--red)">Xoá tất cả KH, đơn hàng, nhân viên, bài học... Không thể hoàn tác!</div></div>
+        <button class="btn btn-danger btn-sm" onclick="cfm('XOÁ TẤT CẢ DỮ LIỆU ⚠️','Thao tác này xoá HOÀN TOÀN mọi dữ liệu và không thể khôi phục. Hãy sao lưu trước nếu cần.',()=>{localStorage.removeItem(SK);location.reload();})">🗑️ Xoá tất cả</button>
+      </div>
+      <div class="set-row">
+        <div><div class="set-label">Reset về dữ liệu demo</div><div class="set-sub">Xoá dữ liệu hiện tại và nạp lại toàn bộ dữ liệu demo ban đầu</div></div>
+        <button class="btn btn-ghost btn-sm" onclick="cfm('Reset dữ liệu demo','Xoá dữ liệu hiện tại và nạp lại bộ dữ liệu demo?',()=>{localStorage.removeItem(SK);location.reload();})">🔄 Reset demo</button>
+      </div>
+    </div>`;
+  }else{
+    body=`
+    <div class="set-card">
+      <h3>🤖 Giới thiệu Em Tèo</h3>
+      <div style="display:flex;gap:18px;align-items:flex-start;padding:4px 0 18px">
+        <div style="width:68px;height:68px;background:linear-gradient(135deg,var(--primary),var(--primary-darker));border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:34px;flex-shrink:0;box-shadow:0 4px 16px rgba(249,115,22,.3)">🤖</div>
+        <div>
+          <div style="font-weight:700;font-size:16px;margin-bottom:6px">Em Tèo — Trợ lý AI của team 💡</div>
+          <div style="font-size:13px;color:var(--muted);line-height:1.8">Em Tèo là chatbot thông minh tích hợp sẵn trong MED-CRM. Em có thể tư vấn kỹ năng bán hàng, xử lý tình huống thực tế, nhắc nợ chuyên nghiệp, và tra cứu thông tin nhanh từ Thư viện kiến thức — mọi lúc, mọi nơi.</div>
+        </div>
+      </div>
+      <div class="set-row">
+        <div><div class="set-label">Hiển thị Em Tèo trên màn hình</div><div class="set-sub">Bật/tắt nút chat ở góc dưới phải màn hình</div></div>
+        <label class="toggle"><input type="checkbox" ${(DB.settings||{}).showTeo!==false?'checked':''} onchange="saveSetting('showTeo',this.checked);toggleTeoBtn()"><span class="toggle-slider"></span></label>
+      </div>
+    </div>
+    <div class="set-card">
+      <h3>💡 Em Tèo giỏi những gì?</h3>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        ${[['🎯','Kỹ năng bán hàng','Tiếp cận KH mới, lắng nghe, xây dựng quan hệ'],['✅','Chốt đơn','7 kỹ thuật chốt, xử lý "để suy nghĩ", đàm phán giá'],['💬','Tình huống thực tế','Script mẫu cho các tình huống khó của sales'],['🚚','Giao hàng','Quy trình chuẩn, xử lý trễ hàng, cổng BV'],['💰','Nhắc nợ','Nhắc theo lịch 15/30/45 ngày, không mất khách'],['🔍','Tra cứu dữ liệu','Hỏi về KH, tồn kho, công nợ, bài học nhanh']].map(([i,t,d])=>`<div style="background:var(--bg);border-radius:10px;padding:12px;display:flex;gap:10px;align-items:flex-start"><span style="font-size:20px;flex-shrink:0">${i}</span><div><div style="font-size:12px;font-weight:700;margin-bottom:2px">${t}</div><div style="font-size:11px;color:var(--muted)">${d}</div></div></div>`).join('')}
+      </div>
+      <div style="margin-top:18px;text-align:center">
+        <button class="btn btn-primary" onclick="if((DB.settings||{}).showTeo===false){saveSetting('showTeo',true);toggleTeoBtn();}document.querySelector('[data-page=dashboard]').click();setTimeout(toggleTeo,200)">💬 Mở chat với Em Tèo ngay</button>
+      </div>
+    </div>`;
+  }
+  document.getElementById('settings').innerHTML=tabBar+body;
+}
+
+function saveSetGeneral(){
+  if(!DB.company)DB.company=seedCompany();
+  const v=id=>document.getElementById(id).value.trim();
+  if(v('set-cname'))DB.company.name=v('set-cname');
+  if(v('set-csname'))DB.company.shortName=v('set-csname');
+  if(v('set-cfounded'))DB.company.founded=v('set-cfounded');
+  if(v('set-ctag'))DB.company.tagline=v('set-ctag');
+  save();toast('Đã lưu thông tin công ty ✅');
+}
+function saveSetPin(){
+  const cur=document.getElementById('set-curpin').value;
+  const np=document.getElementById('set-newpin').value.trim();
+  const cf=document.getElementById('set-cfmpin').value.trim();
+  if(cur!==HR_PIN){toast('Mật khẩu hiện tại không đúng','error');return;}
+  if(!np||np.length<4){toast('Mật khẩu mới tối thiểu 4 ký tự','error');return;}
+  if(np!==cf){toast('Mật khẩu xác nhận không khớp','error');return;}
+  HR_PIN=np;DB.hrPin=np;save();
+  toast('Đã đổi mật khẩu HR thành công ✅');
+  ['set-curpin','set-newpin','set-cfmpin'].forEach(id=>document.getElementById(id).value='');
+}
+function saveSetting(key,val){
+  if(!DB.settings)DB.settings={};
+  DB.settings[key]=val;save();
+}
+function toggleTeoBtn(){
+  const show=(DB.settings||{}).showTeo!==false;
+  document.getElementById('teo-btn').style.display=show?'flex':'none';
+  if(!show)document.getElementById('teo-win').classList.remove('open');
+}
+
+// ═══════ EM TÈO CHATBOT ═══════
+let teoOpen=false,teoStarted=false;
+const TEO_QUICK=[
+  {l:'🎯 Chốt đơn',q:'kỹ thuật chốt đơn'},
+  {l:'💰 Nhắc nợ',q:'nhắc nợ chuyên nghiệp'},
+  {l:'😤 Khách so giá',q:'khách nói giá cao'},
+  {l:'🚚 Giao hàng trễ',q:'xử lý giao hàng trễ'},
+  {l:'📱 Không nghe máy',q:'khách không nghe máy'},
+  {l:'📚 Tìm bài học',q:'tìm bài học trong thư viện'},
+];
+
+function toggleTeo(){
+  teoOpen=!teoOpen;
+  document.getElementById('teo-win').classList.toggle('open',teoOpen);
+  if(teoOpen&&!teoStarted){
+    teoStarted=true;
+    setTimeout(()=>{
+      teoBot('Xin chào! Em là **Em Tèo** 🤖 — trợ lý AI của team mình.\n\nEm có thể giúp bạn:\n• Tư vấn kỹ năng bán hàng\n• Xử lý tình huống thực tế\n• Tra cứu thông tin nhanh\n• Tìm bài học trong thư viện\n\nBạn cần hỗ trợ gì hôm nay?',TEO_QUICK);
+    },300);
+  }
+  if(teoOpen)setTimeout(()=>document.getElementById('teo-inp').focus(),400);
+}
+
+function teoSend(){
+  const inp=document.getElementById('teo-inp');
+  const msg=inp.value.trim();if(!msg)return;
+  inp.value='';
+  teoAddMsg(msg,'user');
+  setTimeout(()=>teoRespond(msg),350);
+}
+
+function teoAddMsg(text,role,chips,libCards){
+  const msgs=document.getElementById('teo-msgs');
+  const div=document.createElement('div');
+  div.className='teo-msg '+role;
+  const html=text.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>');
+  let inner=`<div class="teo-bubble">${html}</div>`;
+  if(chips&&chips.length){
+    inner+=`<div class="teo-chips">${chips.map(c=>`<button class="teo-chip" onclick="teoAsk('${c.q||c.l}')">${c.l}</button>`).join('')}</div>`;
+  }
+  if(libCards&&libCards.length){
+    inner+=libCards.map(l=>`<div class="teo-lib-card" onclick="closeAllAndView('${l.id}')"><div class="teo-lib-title">📖 ${esc(l.title)}</div><div class="teo-lib-sub">⏱ ${l.readTime} phút · ${libCatLabel(l.cat)}</div></div>`).join('');
+  }
+  div.innerHTML=inner;
+  msgs.appendChild(div);
+  msgs.scrollTop=msgs.scrollHeight;
+}
+
+function closeAllAndView(id){
+  document.getElementById('teo-win').classList.remove('open');teoOpen=false;
+  setTimeout(()=>{nav(document.querySelector('[data-page=library]'));viewLib(id);},250);
+}
+
+function teoBot(text,chips,libCards){
+  const msgs=document.getElementById('teo-msgs');
+  const typing=document.createElement('div');
+  typing.className='teo-msg bot';
+  typing.innerHTML=`<div class="teo-bubble"><div class="teo-typing"><div class="teo-dot"></div><div class="teo-dot"></div><div class="teo-dot"></div></div></div>`;
+  msgs.appendChild(typing);msgs.scrollTop=msgs.scrollHeight;
+  setTimeout(()=>{
+    try{msgs.removeChild(typing);}catch(e){}
+    teoAddMsg(text,'bot',chips,libCards);
+  },750);
+}
+
+function teoAsk(q){teoAddMsg(q,'user');setTimeout(()=>teoRespond(q),350);}
+
+function teoRespond(msg){
+  const m=msg.toLowerCase();
+  const libFind=cats=>DB.library.filter(l=>cats.includes(l.cat)).slice(0,2);
+  const libSearch2=()=>DB.library.filter(l=>{
+    const txt=(l.title+l.content+(l.tags||[]).join(' ')).toLowerCase();
+    return m.split(/\s+/).filter(w=>w.length>2).some(w=>txt.includes(w));
+  }).slice(0,3);
+
+  // Chốt đơn
+  if(/(chốt|chot|closing|quyết định mua|không mua)/.test(m)){
+    teoBot('Chốt đơn trong y tế cần kỹ thuật — **không phải ép buộc** 🎯\n\nBí quyết số 1: sau khi đề xuất → im lặng, đừng phá vỡ im lặng bằng cách giảm giá thêm.\n\nEm gợi ý bài học này:',null,libFind(['chot-don']));
+  // Nhắc nợ
+  }else if(/(nhắc nợ|nhac no|thanh toán|quá hạn|thu nợ|đòi tiền|công nợ)/.test(m)){
+    teoBot('Nhắc nợ mà giữ được khách là nghệ thuật 💰\n\n**Nguyên tắc vàng**: nhắc như đang hỗ trợ, không như đang đòi tiền.\n\n• 1-15 ngày: Zalo nhẹ nhàng\n• 15-30 ngày: Gọi điện trực tiếp\n• 30-45 ngày: Thư chính thức\n• >45 ngày: Leo thang cấp trên',null,libFind(['thanh-toan']));
+  // Khách so giá
+  }else if(/(giá cao|đắt|chỗ khác rẻ|so sánh giá|competitor|đối thủ giá)/.test(m)){
+    teoBot('Đừng hoảng và giảm giá ngay! 😤\n\n3 bước xử lý:\n1. **Xác nhận** - cảm ơn vì so sánh\n2. **Hỏi lại** - sản phẩm/thương hiệu có giống nhau không?\n3. **Giải thích giá trị** - giao 24h + đổi trả 30 ngày + CO-CQ đầy đủ\n\nChi tiết ở đây:',null,DB.library.filter(l=>l.id==='lib8'||l.id==='lib7'));
+  // Không nghe máy
+  }else if(/(không nghe|không phản hồi|im lặng|ghost|không trả lời|chặn số)/.test(m)){
+    teoBot('Bình thường lắm — đừng nản! 📱\n\n**Quy trình 5 lần tiếp cận**:\n• Ngày 1: Gọi → Zalo ngay sau\n• Ngày 3: Gọi lại → Email catalog\n• Ngày 5: Zalo kèm thông tin giá trị\n• Ngày 7: Đổi khung giờ gọi\n• Ngày 10: Tin nhắn trao quyền cho khách\n\n**Giờ vàng**: 8:00-9:00 sáng hoặc 12:00-13:00',null,DB.library.filter(l=>l.id==='lib9'));
+  // Giao hàng trễ
+  }else if(/(giao trễ|giao muộn|ship trễ|trễ hàng|delay|không giao kịp)/.test(m)){
+    teoBot('Khi giao trễ: **chủ động báo trước ít nhất 2 tiếng** — đừng để khách tự phát hiện! 🚚\n\nScript:\n💬 *"Anh/chị ơi, đơn hàng hôm nay em giao trễ khoảng 2 tiếng do [lý do]. Em xin lỗi về sự bất tiện này..."*',null,libFind(['giao-hang']));
+  // Hàng lỗi / khiếu nại
+  }else if(/(hàng lỗi|sai hàng|thiếu hàng|khiếu nại|phàn nàn|complaint|giao sai)/.test(m)){
+    teoBot('Khách phàn nàn = họ vẫn muốn làm việc với mình! 💪\n\n**Bước 1 quan trọng nhất**: Lắng nghe và xin lỗi TRƯỚC — KHÔNG giải thích.\n\nKhách cần giải pháp, không cần nghe lý do.',null,DB.library.filter(l=>l.id==='lib10'));
+  // Đối thủ
+  }else if(/(đối thủ|chỗ khác|nhà cung cấp khác|đang dùng|competitor|cạnh tranh)/.test(m)){
+    teoBot('70% khách tiềm năng đang mua của đối thủ rồi — đó là thực tế 😅\n\nChiến lược **"Đặt chân vào cửa"**:\n1. Không tấn công thẳng vào đối thủ\n2. Xin cung cấp 1-2 sản phẩm họ đang thiếu hàng\n3. Thắng đơn đầu bằng tốc độ + chất lượng\n4. Mở rộng dần sau 2-3 đơn',null,DB.library.filter(l=>l.id==='lib11'));
+  // Tiếp cận KH mới
+  }else if(/(tiếp cận|khách mới|cold call|gọi lạnh|lần đầu|mới gặp)/.test(m)){
+    teoBot('Tiếp cận khách hàng mới cần quy trình rõ ràng 5 bước! 🎯\n\n**Lỗi phổ biến nhất**: cố bán ngay trong cuộc gọi đầu tiên.\n\nMục đích cuộc gọi đầu = **xin gặp mặt hoặc gửi catalog** — chỉ vậy thôi.',null,DB.library.filter(l=>l.id==='lib1'));
+  // Tra cứu thư viện
+  }else if(/(tìm bài|thư viện|tra cứu|bài học|library|đọc bài)/.test(m)){
+    const q=m.replace(/(tìm bài|thư viện|tra cứu|bài học|library|đọc bài)/g,'').trim();
+    const hits=q.length>2?DB.library.filter(l=>(l.title+l.content).toLowerCase().includes(q)).slice(0,4):DB.library.filter(l=>l.pinned).slice(0,4);
+    teoBot(hits.length?`Em tìm được **${hits.length} bài học** phù hợp 📚\nNhấn vào bài để đọc chi tiết:`:`Đây là các bài **được ghim** nổi bật nhất 📌`,null,hits.length?hits:DB.library.filter(l=>l.pinned).slice(0,3));
+  // Tồn kho hết hàng
+  }else if(/(tồn kho|hết hàng|thiếu hàng|stock|kho)/.test(m)){
+    const low=DB.products.filter(p=>p.stock<=p.minStock);
+    if(low.length){teoBot(`⚠️ Có **${low.length} sản phẩm** dưới mức tồn kho tối thiểu:\n\n${low.slice(0,5).map(p=>`• **${p.name}**: còn ${p.stock} / min ${p.minStock}`).join('\n')}\n\nVào **Kho hàng** để xử lý nhé!`);}
+    else{teoBot('✅ Tuyệt vời! Hiện tại **không có sản phẩm nào** dưới mức tối thiểu.');}
+  // Công nợ ai nợ
+  }else if(/(ai nợ|danh sách nợ|khách nợ|nợ nhiều|tổng nợ)/.test(m)){
+    const debtors=DB.customers.filter(c=>debt(c.id)>0).sort((a,b)=>debt(b.id)-debt(a.id));
+    if(debtors.length){teoBot(`💰 Có **${debtors.length} khách hàng** đang có công nợ:\n\n${debtors.slice(0,5).map(c=>`• **${c.name}**: ${fmt(debt(c.id))}`).join('\n')}\n\nVào **Công nợ** để xử lý chi tiết nhé!`);}
+    else{teoBot('✅ Tốt lắm! Hiện tại **không có công nợ** nào cần xử lý.');}
+  // Số KH
+  }else if(/(bao nhiêu khách|số khách|danh sách kh|tổng khách)/.test(m)){
+    const bv=DB.customers.filter(c=>c.type==='BV').length;
+    const pk=DB.customers.filter(c=>c.type==='PK').length;
+    const nt=DB.customers.filter(c=>c.type==='NT').length;
+    teoBot(`Hiện CRM có **${DB.customers.length} khách hàng** 📊\n\n• 🏥 Bệnh viện: ${bv} KH\n• 🏨 Phòng khám: ${pk} KH\n• 🏪 Nhà thuốc: ${nt} KH\n• 🔬 PXN & Khác: ${DB.customers.length-bv-pk-nt} KH`);
+  // Chào hỏi
+  }else if(/(xin chào|hello|hi|chào|hey|good morning|buổi sáng|buổi chiều)/.test(m)){
+    const h=new Date().getHours();
+    const gr=h<12?'Buổi sáng':h<18?'Buổi chiều':'Buổi tối';
+    teoBot(`${gr} bạn! 👋 Em Tèo đây, luôn sẵn sàng hỗ trợ.\n\nHôm nay bạn cần em giúp gì?`,TEO_QUICK);
+  // Cảm ơn
+  }else if(/(cảm ơn|thanks|thank you|tks|oke|ok bạn|ok em|ngon)/.test(m)){
+    teoBot('Không có gì ạ! 😊 Bạn cần thêm gì cứ hỏi Em Tèo nhé!\n\nMuốn xem thêm kỹ năng bán hàng không?',TEO_QUICK.slice(0,4));
+  // Em Tèo là ai
+  }else if(/(tèo|em tèo|mày là ai|bạn là ai|bot|ai vậy)/.test(m)){
+    teoBot('Em là **Em Tèo** 🤖 — trợ lý AI được tích hợp vào MED-CRM!\n\nEm được "nuôi dưỡng" bằng toàn bộ kiến thức trong **Thư viện** của công ty mình — từ kỹ năng bán hàng đến xử lý tình huống thực tế.\n\nBạn cần gì thì cứ hỏi nha!',TEO_QUICK);
+  }else{
+    // Fallback: search library
+    const hits=libSearch2();
+    if(hits.length){
+      teoBot(`Em tìm được **${hits.length} bài liên quan** trong thư viện 📚\nThử xem bài nào phù hợp nhé:`,null,hits);
+    }else{
+      teoBot('Em chưa có thông tin chính xác về câu hỏi này 🤔\n\nBạn thử hỏi theo một trong các chủ đề dưới đây nhé:',TEO_QUICK);
+    }
+  }
+}
+
 // ═══════ BACKUP / RESTORE ═══════
 function backupData(){
   const blob=new Blob([JSON.stringify(DB,null,2)],{type:'application/json'});
@@ -2925,6 +3287,7 @@ function restoreData(input){
 
 // ═══════ INIT ═══════
 load();badges();rDash();
+toggleTeoBtn();
 const _n=new Date();const _ds=['Chủ Nhật','Thứ Hai','Thứ Ba','Thứ Tư','Thứ Năm','Thứ Sáu','Thứ Bảy'];
 document.getElementById('pg-sub').textContent=`${_ds[_n.getDay()]}, ${_n.getDate()} tháng ${_n.getMonth()+1} năm ${_n.getFullYear()}`;
 </script>
