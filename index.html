@@ -196,6 +196,36 @@ textarea.form-control{resize:vertical;min-height:72px}
 .budget-row{display:grid;grid-template-columns:2fr 110px 110px 90px;gap:8px;align-items:center;padding:10px 14px;border-bottom:1px solid var(--border)}
 .budget-row:last-child{border-bottom:none}
 .budget-row.header{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;background:var(--bg);border-radius:8px 8px 0 0}
+/* ── Library ── */
+.lib-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+.lib-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px 20px;cursor:pointer;transition:all .15s;position:relative;overflow:hidden;display:flex;flex-direction:column;gap:10px}
+.lib-card:hover{box-shadow:0 6px 20px rgba(0,0,0,.1);transform:translateY(-2px);border-color:var(--primary-border)}
+.lib-card.pinned::after{content:'📌';position:absolute;top:12px;right:12px;font-size:14px}
+.lib-cat-bar{width:4px;position:absolute;left:0;top:0;bottom:0;border-radius:14px 0 0 14px}
+.lib-title{font-size:14px;font-weight:700;color:var(--text);line-height:1.4;padding-right:20px}
+.lib-excerpt{font-size:12px;color:var(--muted);line-height:1.6;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.lib-meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:11px;color:var(--muted);margin-top:auto;padding-top:8px;border-top:1px solid var(--border)}
+.diff-badge{padding:2px 8px;border-radius:12px;font-size:10px;font-weight:700}
+.diff-co-ban{background:#DCFCE7;color:#166534}
+.diff-trung-cap{background:#FEF9C3;color:#854D0E}
+.diff-nang-cao{background:#FEE2E2;color:#991B1B}
+.lib-content h3{font-size:15px;font-weight:700;color:var(--primary-darker);margin:18px 0 8px;padding-bottom:6px;border-bottom:2px solid var(--primary-border)}
+.lib-content h3:first-child{margin-top:0}
+.lib-content p{font-size:13px;line-height:1.8;color:var(--text);margin-bottom:10px}
+.lib-content ul,.lib-content ol{font-size:13px;line-height:1.8;color:var(--text);margin:0 0 12px 18px}
+.lib-content li{margin-bottom:4px}
+.lib-content .script-box{background:#F0FDF4;border:1px solid #86EFAC;border-radius:10px;padding:12px 16px;margin:10px 0;font-size:13px;line-height:1.7;color:#14532D}
+.lib-content .script-box::before{content:'💬 Script mẫu: ';font-weight:700;display:block;margin-bottom:4px;color:#166534}
+.lib-content .warn-box{background:#FEF2F2;border:1px solid #FECACA;border-radius:10px;padding:12px 16px;margin:10px 0;font-size:13px;line-height:1.7;color:#991B1B}
+.lib-content .warn-box::before{content:'⚠️ Lưu ý: ';font-weight:700}
+.lib-content .tip-box{background:#EFF6FF;border:1px solid #BFDBFE;border-radius:10px;padding:12px 16px;margin:10px 0;font-size:13px;line-height:1.7;color:#1E40AF}
+.lib-content .tip-box::before{content:'💡 Mẹo: ';font-weight:700}
+.lib-content .step{display:flex;gap:12px;margin-bottom:12px;align-items:flex-start}
+.lib-content .step-num{width:28px;height:28px;border-radius:50%;background:var(--primary);color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px}
+.cat-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:18px}
+.cat-tab{padding:7px 14px;border:1px solid var(--border);border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;background:var(--card);color:var(--muted);transition:all .15s;white-space:nowrap}
+.cat-tab:hover,.cat-tab.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+@media(max-width:768px){.lib-grid{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -221,6 +251,8 @@ textarea.form-control{resize:vertical;min-height:72px}
     <div class="nav-item" data-page="products" onclick="nav(this)"><span class="ni">💊</span> Sản phẩm</div>
     <div class="nav-item" data-page="inventory" onclick="nav(this)"><span class="ni">📦</span> Kho hàng</div>
     <div class="nav-item" data-page="kpi" onclick="nav(this)"><span class="ni">🎯</span> KPI Sales</div>
+    <div class="nav-sec">Đào tạo</div>
+    <div class="nav-item" data-page="library" onclick="nav(this)"><span class="ni">📚</span> Thư viện <span class="badge" id="badge-lib">0</span></div>
     <div class="nav-sec">Tài chính</div>
     <div class="nav-item" data-page="accounting" onclick="nav(this)"><span class="ni">📒</span> Kế toán</div>
     <div class="nav-sec">Doanh nghiệp</div>
@@ -250,6 +282,7 @@ textarea.form-control{resize:vertical;min-height:72px}
   <div id="debt" class="page"></div>
   <div id="regions" class="page"></div>
   <div id="kpi" class="page"></div>
+  <div id="library" class="page"></div>
   <div id="accounting" class="page"></div>
   <div id="employees" class="page"></div>
   <div id="company" class="page"></div>
@@ -437,6 +470,58 @@ textarea.form-control{resize:vertical;min-height:72px}
   </div>
 </div>
 
+<!-- Library Add/Edit Modal -->
+<div class="modal-bg" id="m-lib">
+  <div class="modal modal-lg">
+    <div class="modal-head"><div class="modal-title" id="mlib-ttl">➕ Thêm bài học mới</div><button class="modal-close" onclick="closeM('m-lib')">✕</button></div>
+    <div class="modal-body"><div class="form-grid">
+      <div class="form-group full"><label>Tiêu đề bài học *</label><input class="form-control" id="mlib-title" placeholder="VD: Cách xử lý khi khách nói 'Giá cao quá'"></div>
+      <div class="form-group"><label>Danh mục *</label>
+        <select class="form-control" id="mlib-cat">
+          <option value="ky-nang">🎯 Kỹ năng bán hàng</option>
+          <option value="chot-don">✅ Chốt đơn</option>
+          <option value="tinh-huong">💬 Tình huống thực tế</option>
+          <option value="giao-hang">🚚 Giao hàng</option>
+          <option value="thanh-toan">💰 Thanh toán & Công nợ</option>
+          <option value="san-pham">💊 Kiến thức sản phẩm</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Độ khó</label>
+        <select class="form-control" id="mlib-diff">
+          <option value="co-ban">🟢 Cơ bản</option>
+          <option value="trung-cap">🟡 Trung cấp</option>
+          <option value="nang-cao">🔴 Nâng cao</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Thời gian đọc (phút)</label><input class="form-control" id="mlib-time" type="number" min="1" value="5"></div>
+      <div class="form-group"><label>Tác giả</label><input class="form-control" id="mlib-author" placeholder="Tên người viết bài"></div>
+      <div class="form-group full"><label>Tags (phân cách bằng dấu phẩy)</label><input class="form-control" id="mlib-tags" placeholder="VD: chốt đơn, giá, phản đối"></div>
+      <div class="form-group full">
+        <label>Nội dung bài học *</label>
+        <div style="font-size:11px;color:var(--muted);margin-bottom:6px">Gợi ý format: dùng === Tiêu đề === để tạo heading, [script] nội dung [/script] cho script mẫu, [tip] nội dung [/tip] cho mẹo, [warn] nội dung [/warn] cho lưu ý</div>
+        <textarea class="form-control" id="mlib-content" rows="12" placeholder="Viết nội dung bài học tại đây...&#10;&#10;=== Phần 1: Giới thiệu ===&#10;Nội dung...&#10;&#10;[script]&#10;Script mẫu...&#10;[/script]&#10;&#10;[tip]Mẹo quan trọng...[/tip]"></textarea>
+      </div>
+      <div class="form-group"><label><input type="checkbox" id="mlib-pinned" style="margin-right:6px">📌 Ghim bài học này (ưu tiên hiển thị)</label></div>
+    </div></div>
+    <div class="modal-foot"><button class="btn btn-ghost" onclick="closeM('m-lib')">Hủy</button><button class="btn btn-primary" onclick="saveLib()">💾 Lưu bài học</button></div>
+  </div>
+</div>
+
+<!-- Library View Modal -->
+<div class="modal-bg" id="m-libview">
+  <div class="modal modal-lg" style="max-width:760px">
+    <div class="modal-head" id="mlibv-head">
+      <div style="flex:1"><div class="modal-title" id="mlibv-ttl"></div><div id="mlibv-meta" style="font-size:12px;color:var(--muted);margin-top:4px"></div></div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <button class="btn btn-sm btn-ghost" id="mlibv-edit-btn">✏️ Sửa</button>
+        <button class="modal-close" onclick="closeM('m-libview')">✕</button>
+      </div>
+    </div>
+    <div class="modal-body lib-content" id="mlibv-body" style="line-height:1.8"></div>
+    <div class="modal-foot"><button class="btn btn-ghost" onclick="closeM('m-libview')">Đóng</button></div>
+  </div>
+</div>
+
 <!-- PIN Overlay -->
 <div id="pin-overlay" style="display:none">
   <div class="pin-overlay" onclick="if(event.target===this)closePinOverlay()">
@@ -467,7 +552,7 @@ textarea.form-control{resize:vertical;min-height:72px}
 
 <script>
 const SK='medcrm_v4';
-let DB={customers:[],products:[],quotes:[],orders:[],inventory:[],followups:[],payments:[],employees:[],finance:[],company:null};
+let DB={customers:[],products:[],quotes:[],orders:[],inventory:[],followups:[],payments:[],employees:[],finance:[],library:[],company:null};
 let HR_PIN='admin';
 
 function save(){localStorage.setItem(SK,JSON.stringify(DB));badges();}
@@ -476,6 +561,7 @@ function load(){
   if(!DB.customers||!DB.customers.length)seed();
   if(!DB.employees||!DB.employees.length)DB.employees=seedEmployees();
   if(!DB.finance||!DB.finance.length)DB.finance=seedFinance();
+  if(!DB.library||!DB.library.length)DB.library=seedLibrary();
   if(!DB.company)DB.company=seedCompany();
   if(!DB.employees)DB.employees=[];
   if(!DB.finance)DB.finance=[];
@@ -745,8 +831,8 @@ function toggleSB(){
 function closeSB(){sbOn=false;document.getElementById('sidebar').classList.remove('open');document.getElementById('overlay').classList.remove('on');}
 
 // ── Nav ──
-const PM={dashboard:{t:'Dashboard',s:''},customers:{t:'Danh sách khách hàng',s:'CRM'},regions:{t:'Khách hàng theo khu vực',s:'Phân bố địa lý'},products:{t:'Sản phẩm & Vật tư',s:'Danh mục'},quotes:{t:'Báo giá',s:''},orders:{t:'Đơn hàng',s:''},inventory:{t:'Kho hàng',s:'Nhập / Xuất / Tồn'},followup:{t:'Follow-up',s:'Lịch liên hệ'},debt:{t:'Công nợ',s:'Thanh toán'},kpi:{t:'KPI Nhân viên Sales',s:'Hiệu suất bán hàng'},accounting:{t:'Kế toán',s:'Thu Chi · P&L · Ngân sách · Dòng tiền'},employees:{t:'Nhân viên',s:'Hồ sơ · Lương bổng · Thành tích'},company:{t:'Hồ sơ Công ty',s:'Tầm nhìn · Chiến lược · Văn hóa'}};
-const PFN={dashboard:rDash,customers:rCust,regions:rRegions,products:rProd,quotes:rQuotes,orders:rOrders,inventory:rInv,followup:rFU,debt:rDebt,kpi:rKPI,accounting:rAccounting,employees:rEmployees,company:rCompany};
+const PM={dashboard:{t:'Dashboard',s:''},customers:{t:'Danh sách khách hàng',s:'CRM'},regions:{t:'Khách hàng theo khu vực',s:'Phân bố địa lý'},products:{t:'Sản phẩm & Vật tư',s:'Danh mục'},quotes:{t:'Báo giá',s:''},orders:{t:'Đơn hàng',s:''},inventory:{t:'Kho hàng',s:'Nhập / Xuất / Tồn'},followup:{t:'Follow-up',s:'Lịch liên hệ'},debt:{t:'Công nợ',s:'Thanh toán'},kpi:{t:'KPI Nhân viên Sales',s:'Hiệu suất bán hàng'},library:{t:'Thư viện kiến thức',s:'Kỹ năng · Chốt đơn · Tình huống · Chiến thuật'},accounting:{t:'Kế toán',s:'Thu Chi · P&L · Ngân sách · Dòng tiền'},employees:{t:'Nhân viên',s:'Hồ sơ · Lương bổng · Thành tích'},company:{t:'Hồ sơ Công ty',s:'Tầm nhìn · Chiến lược · Văn hóa'}};
+const PFN={dashboard:rDash,customers:rCust,regions:rRegions,products:rProd,quotes:rQuotes,orders:rOrders,inventory:rInv,followup:rFU,debt:rDebt,kpi:rKPI,library:rLibrary,accounting:rAccounting,employees:rEmployees,company:rCompany};
 
 function nav(el){
   const p=el.dataset.page;
@@ -762,6 +848,7 @@ function badges(){
   document.getElementById('badge-q').textContent=DB.quotes.filter(q=>q.status==='draft'||q.status==='sent').length;
   document.getElementById('badge-debt').textContent=DB.customers.filter(c=>debt(c.id)>0).length;
   document.getElementById('badge-emp').textContent=DB.employees.filter(e=>e.status==='active').length;
+  document.getElementById('badge-lib').textContent=DB.library?DB.library.length:0;
 }
 
 // ═══════ DASHBOARD ═══════
@@ -1240,9 +1327,21 @@ function rRegions(){
 }
 
 // ═══════ COMPANY PAGE ═══════
+let compTab='profile';
 function rCompany(){
   const co=DB.company;
-  document.getElementById('pg-actions').innerHTML=`<button class="btn btn-primary" onclick="editCompanySection('overview')">✏️ Chỉnh sửa</button>`;
+  document.getElementById('pg-actions').innerHTML=`
+    <button class="btn btn-ghost btn-sm no-print" onclick="printOrgChart()">🖨️ In sơ đồ</button>
+    <button class="btn btn-primary" onclick="editCompanySection('overview')">✏️ Chỉnh sửa</button>`;
+
+  const tabBar=`<div class="tab-bar" style="margin-bottom:20px">
+    <button class="tab-btn ${compTab==='profile'?'active':''}" onclick="compTab='profile';rCompany()">🏢 Hồ sơ công ty</button>
+    <button class="tab-btn ${compTab==='orgchart'?'active':''}" onclick="compTab='orgchart';rCompany()">🗂️ Sơ đồ tổ chức</button>
+    <button class="tab-btn ${compTab==='sop'?'active':''}" onclick="compTab='sop';rCompany()">📋 Quy trình làm việc</button>
+  </div>`;
+
+  if(compTab==='orgchart'){document.getElementById('company').innerHTML=tabBar+buildOrgChart();return;}
+  if(compTab==='sop'){document.getElementById('company').innerHTML=tabBar+buildSOPs();return;}
 
   // OKR section
   const okrHTML=co.okrs.map(o=>{
@@ -1290,7 +1389,7 @@ function rCompany(){
   // Strategy targets
   const targetHTML=co.strategy.targets.map(t=>`<div style="display:flex;gap:8px;align-items:center;margin-bottom:6px"><span style="color:var(--primary);font-size:14px">▸</span><span style="font-size:13px">${esc(t)}</span></div>`).join('');
 
-  document.getElementById('company').innerHTML=`
+  document.getElementById('company').innerHTML=tabBar+`
   <!-- Hero banner -->
   <div style="background:linear-gradient(135deg,var(--primary) 0%,var(--primary-darker) 100%);border-radius:16px;padding:28px 32px;color:#fff;margin-bottom:22px;position:relative;overflow:hidden">
     <div style="position:absolute;right:-20px;top:-20px;font-size:120px;opacity:.08;line-height:1">🏥</div>
@@ -1361,6 +1460,304 @@ function rCompany(){
     <div class="card-header"><div class="card-title">📋 Quy tắc làm việc</div><button class="btn btn-sm btn-ghost" onclick="editCompanySection('rules')">✏️</button></div>
     <div style="padding:6px 18px 14px">${rulesHTML}</div>
   </div>`;
+}
+
+// ── Org Chart & SOP ──
+function buildOrgChart(){
+  const emp=id=>DB.employees.find(e=>e.id===id)||{};
+  const nodeHTML=(e,color,small)=>{
+    if(!e||!e.name)return'';
+    const initials=e.name.split(' ').slice(-2).map(w=>w[0]).join('').toUpperCase().slice(0,2);
+    return`<div style="display:inline-flex;flex-direction:column;align-items:center;gap:6px">
+      <div style="width:${small?52:64}px;height:${small?52:64}px;border-radius:50%;background:${color};display:flex;align-items:center;justify-content:center;font-size:${small?14:18}px;font-weight:700;color:#fff;border:3px solid #fff;box-shadow:0 2px 10px rgba(0,0,0,.15)">${initials}</div>
+      <div style="text-align:center;max-width:${small?90:110}px">
+        <div style="font-size:${small?11:12}px;font-weight:700;color:var(--text);line-height:1.3">${esc(e.name.split(' ').slice(-2).join(' '))}</div>
+        <div style="font-size:${small?10:11}px;color:${color};font-weight:600;margin-top:2px;line-height:1.2">${esc(e.pos||'')}</div>
+      </div>
+    </div>`;
+  };
+  // Lấy nhân viên theo phòng ban
+  const ceo=DB.employees.find(e=>e.dept==='Ban lãnh đạo')||{name:'Chủ công ty',pos:'Giám đốc',id:'ceo'};
+  const trLan=DB.employees.find(e=>e.id==='e2')||{name:'Trần Thị Lan',pos:'Trưởng nhóm Sales'};
+  const ktThu=DB.employees.find(e=>e.id==='e4')||{name:'Phạm Thị Thu Hà',pos:'Kế toán trưởng'};
+  const tkDuc=DB.employees.find(e=>e.id==='e5')||{name:'Hoàng Văn Đức',pos:'Thủ kho'};
+  const hcPhuong=DB.employees.find(e=>e.id==='e10')||{name:'Lê Thị Phương',pos:'Hành chính-NS'};
+  const salesTeam=DB.employees.filter(e=>e.dept==='Kinh doanh'&&e.id!=='e2');
+
+  const salesNodes=salesTeam.map(e=>nodeHTML(e,'#6366F1',true)).join('');
+
+  return`<div id="org-print-area">
+  <div style="text-align:center;margin-bottom:28px">
+    <div style="font-size:20px;font-weight:700;color:var(--primary-dark)">SƠ ĐỒ TỔ CHỨC</div>
+    <div style="font-size:13px;color:var(--muted);margin-top:4px">Công ty TNHH Anh Sáng Y Tế · Cập nhật ${new Date().toLocaleDateString('vi-VN')}</div>
+  </div>
+
+  <!-- Tầng 1: CEO -->
+  <div style="display:flex;justify-content:center;margin-bottom:0">
+    <div style="background:linear-gradient(135deg,var(--primary),var(--primary-darker));border-radius:16px;padding:18px 28px;color:#fff;text-align:center;min-width:200px;box-shadow:0 4px 20px rgba(249,115,22,.35)">
+      <div style="font-size:28px;margin-bottom:8px">👑</div>
+      <div style="font-size:16px;font-weight:700">${esc(ceo.name)}</div>
+      <div style="font-size:12px;opacity:.85;margin-top:3px">${esc(ceo.pos)}</div>
+      <div style="margin-top:10px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
+        <span style="background:rgba(255,255,255,.2);border-radius:6px;padding:3px 10px;font-size:11px">Phê duyệt mọi đơn &gt;50tr</span>
+        <span style="background:rgba(255,255,255,.2);border-radius:6px;padding:3px 10px;font-size:11px">Xử lý công nợ 45+ ngày</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Connector line down -->
+  <div style="display:flex;justify-content:center"><div style="width:2px;height:32px;background:var(--border)"></div></div>
+
+  <!-- Horizontal line across 4 branches -->
+  <div style="position:relative;margin-bottom:0">
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;position:relative">
+      <!-- Line across top -->
+      <div style="position:absolute;top:0;left:12.5%;right:12.5%;height:2px;background:var(--border)"></div>
+
+      <!-- Branch 1: Sales -->
+      <div style="display:flex;flex-direction:column;align-items:center">
+        <div style="width:2px;height:24px;background:var(--border)"></div>
+        <div style="background:#EEF2FF;border:2px solid #6366F1;border-radius:14px;padding:14px 16px;text-align:center;width:100%;max-width:200px">
+          <div style="font-size:13px;font-weight:700;color:#4338CA;margin-bottom:3px">${esc(trLan.name.split(' ').slice(-2).join(' '))}</div>
+          <div style="font-size:11px;color:#6366F1;font-weight:600">${esc(trLan.pos)}</div>
+          <div style="font-size:10px;color:var(--muted);margin-top:6px;line-height:1.5">Quản lý team Sales<br>Duyệt báo giá &lt;50tr<br>Nhắc công nợ 15-30 ngày</div>
+        </div>
+        <div style="width:2px;height:20px;background:var(--border)"></div>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center">
+          ${salesTeam.slice(0,3).map(e=>`<div style="background:#F5F3FF;border:1px solid #A5B4FC;border-radius:10px;padding:10px 10px;text-align:center;width:82px">
+            <div style="width:32px;height:32px;border-radius:50%;background:#6366F1;color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;margin:0 auto 6px">${e.name.split(' ').slice(-2).map(w=>w[0]).join('').toUpperCase().slice(0,2)}</div>
+            <div style="font-size:10px;font-weight:700;line-height:1.3">${e.name.split(' ').slice(-1)[0]}</div>
+            <div style="font-size:9px;color:var(--muted);margin-top:2px">${e.pos.replace('Nhân viên ','').replace('Chăm sóc ','CSKH ')}</div>
+          </div>`).join('')}
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:8px">
+          ${salesTeam.slice(3).map(e=>`<div style="background:#F5F3FF;border:1px solid #A5B4FC;border-radius:10px;padding:10px 10px;text-align:center;width:82px">
+            <div style="width:32px;height:32px;border-radius:50%;background:#6366F1;color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;margin:0 auto 6px">${e.name.split(' ').slice(-2).map(w=>w[0]).join('').toUpperCase().slice(0,2)}</div>
+            <div style="font-size:10px;font-weight:700;line-height:1.3">${e.name.split(' ').slice(-1)[0]}</div>
+            <div style="font-size:9px;color:var(--muted);margin-top:2px">${e.pos.replace('Nhân viên ','').replace('Chăm sóc ','CSKH ')}</div>
+          </div>`).join('')}
+        </div>
+      </div>
+
+      <!-- Branch 2: Kế toán -->
+      <div style="display:flex;flex-direction:column;align-items:center">
+        <div style="width:2px;height:24px;background:var(--border)"></div>
+        <div style="background:#ECFDF5;border:2px solid #10B981;border-radius:14px;padding:14px 16px;text-align:center;width:100%;max-width:200px">
+          <div style="font-size:13px;font-weight:700;color:#065F46;margin-bottom:3px">${esc(ktThu.name.split(' ').slice(-2).join(' '))}</div>
+          <div style="font-size:11px;color:#10B981;font-weight:600">${esc(ktThu.pos)}</div>
+          <div style="font-size:10px;color:var(--muted);margin-top:6px;line-height:1.5">Sổ sách thu chi<br>Báo cáo tài chính hàng tháng<br>Theo dõi công nợ toàn bộ</div>
+        </div>
+        <div style="width:2px;height:20px;background:var(--border)"></div>
+        <div style="background:#F0FDF4;border:1px solid #6EE7B7;border-radius:10px;padding:12px 14px;text-align:center;width:90%;max-width:160px">
+          <div style="font-size:11px;font-weight:700;color:#065F46">📊 Nhiệm vụ</div>
+          <div style="font-size:10px;color:var(--muted);margin-top:6px;line-height:1.6;text-align:left">• Ghi nhận thu/chi hàng ngày<br>• Báo cáo P&L ngày 5 hàng tháng<br>• Đối chiếu công nợ mỗi tuần<br>• Lương nhân viên ngày 28</div>
+        </div>
+      </div>
+
+      <!-- Branch 3: Kho -->
+      <div style="display:flex;flex-direction:column;align-items:center">
+        <div style="width:2px;height:24px;background:var(--border)"></div>
+        <div style="background:#FFF7ED;border:2px solid #F97316;border-radius:14px;padding:14px 16px;text-align:center;width:100%;max-width:200px">
+          <div style="font-size:13px;font-weight:700;color:#7C2D12;margin-bottom:3px">${esc(tkDuc.name.split(' ').slice(-2).join(' '))}</div>
+          <div style="font-size:11px;color:#F97316;font-weight:600">${esc(tkDuc.pos)}</div>
+          <div style="font-size:10px;color:var(--muted);margin-top:6px;line-height:1.5">Quản lý kho hàng<br>Xuất hàng theo lệnh duyệt<br>Cảnh báo hàng sắp hết</div>
+        </div>
+        <div style="width:2px;height:20px;background:var(--border)"></div>
+        <div style="background:#FFF7ED;border:1px solid #FED7AA;border-radius:10px;padding:12px 14px;text-align:center;width:90%;max-width:160px">
+          <div style="font-size:11px;font-weight:700;color:#7C2D12">📦 Nhiệm vụ</div>
+          <div style="font-size:10px;color:var(--muted);margin-top:6px;line-height:1.6;text-align:left">• Kiểm tồn kho mỗi sáng<br>• Giao hàng đúng giờ ≥97%<br>• Báo hàng gần hết ngay khi &lt;min<br>• Kiểm tra hạn SD định kỳ</div>
+        </div>
+      </div>
+
+      <!-- Branch 4: HC-NS -->
+      <div style="display:flex;flex-direction:column;align-items:center">
+        <div style="width:2px;height:24px;background:var(--border)"></div>
+        <div style="background:#FDF4FF;border:2px solid #A855F7;border-radius:14px;padding:14px 16px;text-align:center;width:100%;max-width:200px">
+          <div style="font-size:13px;font-weight:700;color:#581C87;margin-bottom:3px">${esc(hcPhuong.name.split(' ').slice(-2).join(' '))}</div>
+          <div style="font-size:11px;color:#A855F7;font-weight:600">${esc(hcPhuong.pos)}</div>
+          <div style="font-size:10px;color:var(--muted);margin-top:6px;line-height:1.5">Hành chính tổng hợp<br>Hồ sơ nhân viên<br>Hỗ trợ pháp lý hợp đồng</div>
+        </div>
+        <div style="width:2px;height:20px;background:var(--border)"></div>
+        <div style="background:#FDF4FF;border:1px solid #D8B4FE;border-radius:10px;padding:12px 14px;text-align:center;width:90%;max-width:160px">
+          <div style="font-size:11px;font-weight:700;color:#581C87">📁 Nhiệm vụ</div>
+          <div style="font-size:10px;color:var(--muted);margin-top:6px;line-height:1.6;text-align:left">• Hồ sơ nhân viên đầy đủ<br>• Tuyển dụng khi cần<br>• Giấy tờ, hợp đồng, CO-CQ<br>• Nội quy & đào tạo mới</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Reporting rules -->
+  <div style="margin-top:32px;background:var(--primary-light);border:1px solid var(--primary-border);border-radius:14px;padding:20px 24px">
+    <div style="font-size:14px;font-weight:700;color:var(--primary-darker);margin-bottom:14px">⚡ Quy tắc báo cáo — AI báo cáo cho AI, KHI NÀO</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">
+      <div style="background:#fff;border-radius:10px;padding:14px 16px">
+        <div style="font-size:12px;font-weight:700;color:var(--primary);margin-bottom:8px">🌅 8:00 MỖI NGÀY</div>
+        <div style="font-size:12px;color:var(--text);line-height:1.7">
+          <b>Sales → Trưởng nhóm:</b><br>
+          • Kế hoạch ngày (khách sẽ gặp, BG sẽ gửi)<br>
+          • Vướng mắc cần hỗ trợ<br><br>
+          <b>Thủ kho → Trưởng nhóm:</b><br>
+          • Tồn kho hàng dưới mức tối thiểu
+        </div>
+      </div>
+      <div style="background:#fff;border-radius:10px;padding:14px 16px">
+        <div style="font-size:12px;font-weight:700;color:var(--primary);margin-bottom:8px">🌇 17:00 MỖI NGÀY</div>
+        <div style="font-size:12px;color:var(--text);line-height:1.7">
+          <b>Sales → Trưởng nhóm:</b><br>
+          • Đã làm gì hôm nay (gặp/gọi/BG/đơn)<br>
+          • Cập nhật CRM trước khi về<br><br>
+          <b>Trưởng nhóm → Chủ:</b><br>
+          • Tóm tắt ngày + vấn đề cần quyết định
+        </div>
+      </div>
+      <div style="background:#fff;border-radius:10px;padding:14px 16px">
+        <div style="font-size:12px;font-weight:700;color:var(--primary);margin-bottom:8px">📅 TUẦN/THÁNG</div>
+        <div style="font-size:12px;color:var(--text);line-height:1.7">
+          <b>Thứ Hai 8:30 — Họp team:</b><br>
+          • Review tuần qua · Plan tuần mới<br>
+          • Cập nhật KPI · Giải quyết vướng mắc<br><br>
+          <b>Ngày 5 hàng tháng — Kế toán:</b><br>
+          • Báo cáo P&L tháng cho Chủ
+        </div>
+      </div>
+    </div>
+  </div>
+</div>`;
+}
+
+function buildSOPs(){
+  const step=(num,who,color,icon,title,details,time,note)=>`
+    <div style="display:flex;gap:14px;align-items:flex-start;margin-bottom:14px">
+      <div style="flex-shrink:0;width:36px;height:36px;border-radius:50%;background:${color};color:#fff;font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center">${num}</div>
+      <div style="flex:1">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap">
+          <span style="font-size:14px">${icon}</span>
+          <span style="font-size:13px;font-weight:700;color:var(--text)">${title}</span>
+          <span style="font-size:11px;background:${color}20;color:${color};border-radius:6px;padding:2px 8px;font-weight:600">${who}</span>
+          ${time?`<span style="font-size:11px;color:var(--muted)">⏱ ${time}</span>`:''}
+        </div>
+        <div style="font-size:12px;color:var(--muted);line-height:1.6;padding-left:4px">${details}</div>
+        ${note?`<div style="margin-top:6px;background:#FFF7ED;border-left:3px solid var(--primary);padding:6px 10px;border-radius:0 6px 6px 0;font-size:11px;color:var(--primary-darker)">⚠️ ${note}</div>`:''}
+      </div>
+    </div>
+    <div style="margin-left:18px;width:2px;height:12px;background:${color}40;margin-bottom:2px"></div>`;
+
+  const sopCard=(title,icon,color,content)=>`
+    <div class="card" style="margin-bottom:18px">
+      <div class="card-header" style="background:${color}10;border-bottom:2px solid ${color}30">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="font-size:24px">${icon}</div>
+          <div>
+            <div class="card-title" style="color:${color};font-size:15px">${title}</div>
+          </div>
+        </div>
+      </div>
+      <div style="padding:20px">${content}</div>
+    </div>`;
+
+  // SOP 1: Bán hàng
+  const sop1=step(1,'Sales','#6366F1','🔍','Tìm kiếm & tiếp cận khách hàng','Tìm khách qua referral, gọi lạnh, triển lãm, mạng xã hội. Ghi tên + SĐT vào CRM ngay khi có lead.','Hàng ngày','Không được gọi khách sau 18:00 hoặc trước 8:00')
+    +step(2,'Sales','#6366F1','📝','Ghi hồ sơ khách vào CRM','Điền đầy đủ: tên cơ sở, loại hình, người liên hệ, SĐT, sản phẩm quan tâm. Ghi ngay sau cuộc gọi đầu tiên.','Trong ngày',null)
+    +step(3,'Sales → Trưởng nhóm','#8B5CF6','💰','Tạo & gửi báo giá','Tạo BG trong CRM với mã BG-YYYYMMDD-XXX. BG dưới 50 triệu: Sales tự gửi. BG trên 50 triệu: phải có Trưởng nhóm duyệt trước.','Trong 2 giờ làm việc','BG phải ghi rõ ngày hiệu lực, người lập, chiết khấu nếu có')
+    +step(4,'Sales','#8B5CF6','📞','Follow-up báo giá','Sau 2 ngày chưa phản hồi: gọi hỏi lại. Sau 5 ngày: cập nhật trạng thái BG trong CRM (accepted/rejected/sent).','Sau 2 ngày gửi BG',null)
+    +step(5,'Sales + Thủ kho','#F97316','✅','Chốt đơn & kiểm tồn kho','Khi khách đồng ý: tạo đơn hàng trong CRM. Sales báo Thủ kho kiểm tra tồn thực tế TRƯỚC khi hứa ngày giao.','Ngay khi khách OK','Không được hứa ngày giao khi chưa xác nhận tồn kho')
+    +step(6,'Thủ kho','#F97316','📦','Chuẩn bị & xuất hàng','In phiếu xuất kho từ CRM. Kiểm tra SL, hạn SD, chất lượng trước khi đóng gói. Ghi lại lô hàng xuất.','Theo lịch giao hàng',null)
+    +step(7,'Thủ kho + Sales','#10B981','🚚','Giao hàng & xác nhận nhận hàng','Giao hàng và lấy chữ ký xác nhận. Sales gửi tin nhắn hỏi thăm sau giao. Cập nhật đơn hàng → "Hoàn thành" trong CRM.','Ngày giao hàng',null)
+    +step(8,'Sales → Kế toán','#10B981','💳','Thu tiền & cập nhật công nợ','Nhắc khách thanh toán đúng hạn. Khi nhận tiền: ghi vào CRM + báo Kế toán ghi sổ ngay trong ngày.','Theo kỳ hạn hợp đồng','Không được nhận tiền mặt >20tr mà không báo Kế toán & Chủ trong ngày');
+
+  // SOP 2: Kho
+  const sop2N=step(1,'Sales/Trưởng nhóm','#F97316','📋','Lập lệnh nhập hàng','Khi tồn kho < mức tối thiểu hoặc có đơn lớn sắp tới: Sales/Trưởng nhóm gửi yêu cầu nhập hàng cho Chủ/Thủ kho.','Khi tồn < min stock',null)
+    +step(2,'Chủ công ty','#EF4444','✅','Phê duyệt đơn nhập','Chủ phê duyệt danh sách hàng, số lượng, nhà cung cấp. Đơn nhập > 20tr cần chữ ký Chủ.','Trong 4 giờ làm việc',null)
+    +step(3,'Thủ kho','#F97316','📥','Nhận & kiểm tra hàng','Đếm SL, kiểm tra hạn SD, kiểm tra CO-CQ nếu có. Ký biên nhận với NCC. Ghi nhập kho vào CRM.','Khi hàng về','Từ chối nhận hàng không đủ giấy tờ hoặc lỗi/hư hỏng')
+    +step(4,'Thủ kho','#10B981','📊','Cập nhật tồn kho & báo cáo','Cập nhật CRM ngay sau nhập. Báo cáo tồn kho tổng hợp cho Trưởng nhóm vào mỗi sáng thứ Hai.','Ngay sau nhập kho',null);
+  const sop2X=step(1,'Sales','#6366F1','🛒','Có đơn hàng xác nhận','Đơn hàng phải được tạo trong CRM với trạng thái "Chờ xử lý" trước khi yêu cầu xuất kho.','Khi chốt đơn',null)
+    +step(2,'Trưởng nhóm/Chủ','#EF4444','🔐','Duyệt xuất kho','Trưởng nhóm duyệt xuất kho dưới 50tr. Chủ duyệt trên 50tr. Không xuất kho khi chưa có duyệt.','Trong 2 giờ','Tuyệt đối không xuất hàng khi chưa có lệnh duyệt')
+    +step(3,'Thủ kho','#F97316','📤','Xuất hàng & ghi phiếu','Xuất đúng SL, đúng lô, đúng hạn SD. Ghi phiếu xuất kho. Cập nhật CRM trừ tồn.','Theo lịch giao',null);
+
+  // SOP 3: Báo cáo
+  const sop3=`<div style="display:grid;gap:14px">
+    ${[
+      ['🌅','8:00 SÁNG MỖI NGÀY','Sales','Trưởng nhóm Sales','#6366F1',
+       '<b>Nội dung báo cáo sáng (qua Zalo/trực tiếp):</b><br>① Hôm nay sẽ gặp/gọi những khách nào<br>② BG nào đang chờ phản hồi cần follow-up<br>③ Có vấn đề gì cần hỗ trợ từ Trưởng nhóm không',
+       'Gửi trễ hơn 8:30 → Trưởng nhóm nhắc nhở lần 1. Lặp lại 3 lần → ghi vào hồ sơ nhân viên.'],
+      ['🌅','8:15 SÁNG MỖI NGÀY','Thủ kho','Trưởng nhóm','#F97316',
+       '<b>Báo cáo tồn kho sáng:</b><br>① Danh sách hàng tồn kho < mức tối thiểu<br>② Hàng sắp hết hạn trong 30 ngày tới<br>③ Tình trạng đơn hàng đang giao trong ngày',null],
+      ['🌇','17:00 CHIỀU MỖI NGÀY','Sales','Trưởng nhóm Sales','#8B5CF6',
+       '<b>Báo cáo kết quả ngày (vào CRM + Zalo):</b><br>① Đã làm gì: gặp mặt, gọi điện, gửi BG, chốt đơn<br>② Kết quả cụ thể: BG được duyệt/từ chối, đơn hàng mới<br>③ Cập nhật CRM trước khi rời văn phòng',
+       'Bắt buộc cập nhật CRM cuối ngày. Không cập nhật = chưa hoàn thành công việc.'],
+      ['🌇','17:30 CHIỀU MỖI NGÀY','Trưởng nhóm','Chủ công ty','#EF4444',
+       '<b>Tóm tắt ngày cho Chủ (qua Zalo — ngắn gọn):</b><br>① Doanh số ngày hôm nay (đơn mới + thu tiền)<br>② Vấn đề phát sinh cần Chủ quyết định<br>③ Cần hỗ trợ nguồn lực gì không',null],
+      ['📅','THỨ HAI 8:30 MỖI TUẦN','Tất cả','Họp team (30 phút)','#10B981',
+       '<b>Agenda họp tuần (cố định 30 phút, không trễ):</b><br>① Review KPI tuần qua — ai đạt, ai cần cải thiện<br>② Khó khăn & giải pháp — giải quyết ngay tại chỗ<br>③ Kế hoạch tuần mới — assign nhiệm vụ cụ thể<br>④ Cập nhật sản phẩm mới/giá mới/chính sách mới',null],
+      ['📊','NGÀY 5 HÀNG THÁNG','Kế toán trưởng','Chủ công ty','#10B981',
+       '<b>Báo cáo tài chính tháng:</b><br>① Doanh thu vs Kế hoạch<br>② Chi phí theo từng danh mục<br>③ Lợi nhuận thực tế<br>④ Danh sách công nợ quá hạn<br>⑤ Tồn quỹ cuối tháng',null],
+    ].map(([ico,time,from,to,col,details,warn])=>`
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px 18px;border-left:4px solid ${col}">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap">
+          <span style="font-size:18px">${ico}</span>
+          <span style="font-weight:700;font-size:13px;color:${col}">${time}</span>
+          <span style="font-size:12px;color:var(--muted)">${from} → <strong style="color:var(--text)">${to}</strong></span>
+        </div>
+        <div style="font-size:12px;color:var(--text);line-height:1.7">${details}</div>
+        ${warn?`<div style="margin-top:8px;background:#FEF2F2;border:1px solid #FECACA;border-radius:8px;padding:8px 12px;font-size:11px;color:#991B1B">🚨 ${warn}</div>`:''}
+      </div>`).join('')}
+  </div>`;
+
+  // SOP 4: Công nợ
+  const sop4=step(1,'Kế toán','#F59E0B','🔔','Phát hiện công nợ','Kế toán đối chiếu đơn hàng vs thanh toán mỗi tuần. Lập danh sách khách quá hạn và gửi cho Sales tương ứng.','Mỗi thứ Hai','Công nợ quá hạn phải được báo ngay trong ngày phát hiện')
+    +step(2,'Sales phụ trách','#F59E0B','📱','15 ngày — Nhắc qua Zalo/điện thoại','Gửi tin nhắn nhẹ nhàng: "Anh/chị ơi, hóa đơn tháng X đến kỳ thanh toán rồi ạ. Mình hỗ trợ gì được không?" Ghi vào follow-up CRM.','Ngày thứ 15','Giọng thân thiện, KHÔNG đề cập số tiền trong tin nhắn lần đầu')
+    +step(3,'Sales + Trưởng nhóm','#EF4444','📞','30 ngày — Gọi điện chính thức + gửi sao kê','Sales gọi điện xác nhận kỳ hạn thanh toán. Gửi email/Zalo kèm sao kê công nợ chính thức. Hỏi nguyên nhân trì hoãn và đề xuất phương án trả dần nếu cần.','Ngày thứ 30',null)
+    +step(4,'Chủ công ty','#DC2626','🚨','45 ngày — Leo thang lên Chủ xử lý','Chủ trực tiếp liên hệ người quyết định tài chính của bên khách. Xem xét tạm ngưng giao hàng đến khi thanh toán. Báo Kế toán lập hồ sơ pháp lý nếu cần.','Ngày thứ 45','Đặc biệt: BV công được cộng thêm 30 ngày (= 75 ngày) do quy trình phê duyệt thanh toán chậm')
+    +`<div style="background:#F0FDF4;border:1px solid #6EE7B7;border-radius:10px;padding:14px 16px;margin-top:4px">
+        <div style="font-size:12px;font-weight:700;color:#065F46;margin-bottom:8px">📌 Phân biệt theo loại khách hàng</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;font-size:12px">
+          <div style="background:#fff;border-radius:8px;padding:10px 12px;border:1px solid #A7F3D0">
+            <div style="font-weight:700;color:#065F46;margin-bottom:4px">🏥 BV Công</div>
+            <div style="color:var(--muted);line-height:1.6">Ngày 15: Nhắc<br>Ngày 45: Gọi<br>Ngày 75: Lên Chủ</div>
+          </div>
+          <div style="background:#fff;border-radius:8px;padding:10px 12px;border:1px solid #A7F3D0">
+            <div style="font-weight:700;color:#065F46;margin-bottom:4px">🏨 PK Tư nhân</div>
+            <div style="color:var(--muted);line-height:1.6">Ngày 15: Nhắc<br>Ngày 30: Gọi<br>Ngày 45: Lên Chủ</div>
+          </div>
+          <div style="background:#fff;border-radius:8px;padding:10px 12px;border:1px solid #A7F3D0">
+            <div style="font-weight:700;color:#065F46;margin-bottom:4px">💊 NT & PXN</div>
+            <div style="color:var(--muted);line-height:1.6">Ngày 15: Nhắc<br>Ngày 30: Gọi<br>Ngày 45: Lên Chủ</div>
+          </div>
+        </div>
+      </div>`;
+
+  return`<div id="sop-print-area">
+    <div style="text-align:center;margin-bottom:24px">
+      <div style="font-size:20px;font-weight:700;color:var(--primary-dark)">QUY TRÌNH LÀM VIỆC — SOP</div>
+      <div style="font-size:13px;color:var(--muted);margin-top:4px">Công ty TNHH Anh Sáng Y Tế · Tất cả nhân viên bắt buộc nắm rõ và thực hiện đúng</div>
+    </div>
+    ${sopCard('QUY TRÌNH 1: BÁN HÀNG — Từ khách tiềm năng đến thu tiền','🛒','#6366F1',sop1.replace(/<div style="margin-left:18px.*?<\/div>/g,'').replace(/<div style="margin-left:18px[^>]*>[^<]*<\/div>/g,''))}
+    ${sopCard('QUY TRÌNH 2: NHẬP KHO','📦','#F97316','<div style="font-size:13px;font-weight:700;color:var(--muted);margin-bottom:12px;text-transform:uppercase;letter-spacing:.5px">Quy trình nhập kho</div>'+sop2N.replace(/<div style="margin-left:18px.*?<\/div>/g,'')+'<div style="font-size:13px;font-weight:700;color:var(--muted);margin:18px 0 12px;text-transform:uppercase;letter-spacing:.5px;border-top:1px solid var(--border);padding-top:18px">Quy trình xuất kho</div>'+sop2X.replace(/<div style="margin-left:18px.*?<\/div>/g,''))}
+    ${sopCard('QUY TRÌNH 3: BÁO CÁO — Ai báo cáo gì, lúc mấy giờ','📊','#10B981',sop3)}
+    ${sopCard('QUY TRÌNH 4: XỬ LÝ CÔNG NỢ — Bậc thang leo thang','💰','#EF4444',sop4.replace(/<div style="margin-left:18px.*?<\/div>/g,''))}
+  </div>`;
+}
+
+function printOrgChart(){
+  const oc=document.getElementById('org-print-area')||document.getElementById('sop-print-area');
+  if(!oc){toast('Vui lòng mở tab Sơ đồ hoặc Quy trình trước','info');return;}
+  const win=window.open('','_blank');
+  win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Sơ đồ tổ chức — Anh Sáng Y Tế</title>
+  <style>
+    body{font-family:Arial,sans-serif;font-size:12px;color:#111;padding:15mm 12mm;margin:0}
+    *{box-sizing:border-box}
+    .card{background:#fff;border:1px solid #E5E7EB;border-radius:12px;margin-bottom:16px;overflow:hidden}
+    .card-header{padding:12px 16px;border-bottom:2px solid #f0f0f0;display:flex;align-items:center;gap:10px}
+    @media print{body{padding:8mm}}
+  </style></head><body>
+  <div style="text-align:center;margin-bottom:20px;padding-bottom:16px;border-bottom:2px solid #F97316">
+    <div style="font-size:18px;font-weight:700;color:#C2410C">🏥 ANH SÁNG Y TẾ</div>
+    <div style="font-size:11px;color:#666;margin-top:4px">Tài liệu nội bộ — ${new Date().toLocaleDateString('vi-VN')}</div>
+  </div>
+  ${oc.innerHTML}
+  </body></html>`);
+  win.document.close();
+  setTimeout(()=>win.print(),600);
 }
 
 // ── Company edit modals ──
@@ -2007,6 +2404,496 @@ function renderCashflowChart(){
     if(_cfChart){_cfChart.destroy();_cfChart=null;}
     const ctx=document.getElementById('chart-cf');if(!ctx)return;
     _cfChart=new Chart(ctx,{type:'bar',data:{labels,datasets:[{label:'Tiền vào (tr₫)',data:inData,backgroundColor:'rgba(16,185,129,.7)',borderRadius:4},{label:'Tiền ra (tr₫)',data:outData,backgroundColor:'rgba(239,68,68,.6)',borderRadius:4},{type:'line',label:'Luỹ kế (tr₫)',data:cumData,borderColor:'#3B82F6',backgroundColor:'rgba(59,130,246,.1)',tension:.3,fill:true,pointRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:11}}}},scales:{y:{ticks:{callback:v=>v+'M'},grid:{color:'rgba(0,0,0,.05)'}},x:{grid:{display:false}}}}});
+  });
+}
+
+// ═══════ LIBRARY ═══════
+function seedLibrary(){
+  return [
+    {id:'lib1',title:'Quy trình 5 bước tiếp cận khách hàng mới',cat:'ky-nang',difficulty:'co-ban',readTime:7,author:'Ban Kinh Doanh',tags:['tiếp cận','khách mới','quy trình'],pinned:true,views:0,createdAt:'2025-01-10',content:`=== Bước 1: Nghiên cứu trước khi gọi ===
+Trước khi liên hệ, cần biết:
+• Cơ sở là BV/PK/NT/PXN?
+• Quy mô bao nhiêu giường/bệnh nhân/ngày?
+• Đang mua hàng từ đâu? (competitor research)
+• Ai là người ra quyết định mua? (DS trưởng, Giám đốc, Trưởng khoa)
+
+[tip]Tra Google Maps → tìm số điện thoại → gọi hỏi "cho hỏi DS trưởng / bộ phận mua sắm tên gì và số máy lẻ là bao nhiêu?"[/tip]
+
+=== Bước 2: Cuộc gọi đầu tiên ===
+Mục đích: xin được gặp mặt hoặc gửi catalog — KHÔNG cố bán ngay.
+
+[script]
+"Chào anh/chị [Tên], em là [Tên] từ Công ty Anh Sáng Y Tế. Bên em chuyên cung cấp vật tư y tế cho các bệnh viện khu vực. Em muốn hỏi hiện tại bên mình đang mua kim tiêm, găng tay từ đơn vị nào không? Em muốn gửi bảng giá để anh/chị so sánh ạ."
+[/script]
+
+=== Bước 3: Lần gặp đầu tiên ===
+Mang theo: Catalog sản phẩm + 2-3 mẫu vật + name card
+Thời gian gặp lý tưởng: 15-30 phút
+Nguyên tắc: NGHE nhiều hơn NÓI. Hỏi về nhu cầu, không chào hàng ngay.
+
+[tip]Câu hỏi vàng: "Hiện tại cơ sở mình đang gặp khó khăn gì với nhà cung cấp hiện tại?"[/tip]
+
+=== Bước 4: Gửi báo giá & follow up ===
+• Gửi báo giá trong 24h sau cuộc gặp
+• Follow up sau 2 ngày nếu chưa nhận phản hồi
+• Hỏi cụ thể: "Anh/chị đã xem qua báo giá chưa? Có sản phẩm nào cần điều chỉnh không?"
+
+=== Bước 5: Chốt đơn đầu tiên ===
+Đơn đầu quan trọng nhất — chấp nhận chiết khấu tốt để tạo quan hệ.
+Sau khi giao đơn đầu: gọi hỏi thăm chất lượng → mở ra cơ hội đơn tiếp theo.
+
+[warn]Đừng bỏ cuộc sau 1-2 lần từ chối. 80% khách hàng cần 4-7 lần tiếp xúc trước khi quyết định mua.[/warn]`},
+    {id:'lib2',title:'Kỹ năng lắng nghe chủ động trong bán hàng y tế',cat:'ky-nang',difficulty:'co-ban',readTime:5,author:'Ban Kinh Doanh',tags:['lắng nghe','giao tiếp','tâm lý'],pinned:false,views:0,createdAt:'2025-01-15',content:`=== Tại sao lắng nghe quan trọng hơn nói? ===
+Trong y tế, khách hàng (DS, BS) là chuyên gia trong lĩnh vực của họ. Họ không cần bạn dạy họ về sản phẩm — họ cần bạn HIỂU nhu cầu và đề xuất đúng giải pháp.
+Nhân viên bán hàng giỏi dành 70% thời gian để NGHE — chỉ 30% để nói.
+
+=== 4 kỹ năng lắng nghe chủ động ===
+
+[tip]1. Gật đầu và phản hồi bằng lời: "Vâng", "À đúng rồi", "Em hiểu ạ" — cho họ biết bạn đang chú ý[/tip]
+
+[tip]2. Nhắc lại điểm chính: "Như anh/chị vừa nói là hiện tại kim tiêm hay bị... em hiểu đúng không ạ?"[/tip]
+
+[tip]3. Hỏi câu hỏi mở: Không hỏi "Có cần mua không?" mà hỏi "Tháng nào cơ sở dùng nhiều nhất? Số lượng khoảng bao nhiêu?"[/tip]
+
+[tip]4. Ghi chép ngay: Mang theo sổ tay — ghi lại nhu cầu, phàn nàn, ngày tháng. Lần sau nhắc lại → khách ấn tượng[/tip]
+
+=== Câu hỏi vàng để khai thác nhu cầu ===
+• "Hiện tại bên mình đang dùng sản phẩm gì? Mua từ đâu?"
+• "Có vấn đề gì với nhà cung cấp hiện tại không?"
+• "Mỗi tháng dùng khoảng bao nhiêu? Có đợt cao điểm không?"
+• "Tiêu chí quan trọng nhất khi chọn nhà cung cấp là gì?"
+
+[warn]Đừng ngắt lời khách khi họ đang nói — dù bạn đã biết câu trả lời. Ngắt lời = mất tin tưởng[/warn]`},
+    {id:'lib3',title:'Xây dựng mối quan hệ bền vững với khách hàng BV/PK',cat:'ky-nang',difficulty:'trung-cap',readTime:8,author:'Ban Kinh Doanh',tags:['quan hệ','chăm sóc','retention'],pinned:false,views:0,createdAt:'2025-02-01',content:`=== Khác biệt giữa "bán hàng" và "xây dựng quan hệ" ===
+Bán hàng một lần: cần một cuộc gọi
+Giữ khách hàng 5 năm: cần sự tin tưởng liên tục
+
+Trong y tế, một BV/PK khi đã quen với nhà cung cấp sẽ rất ngại đổi — nhưng khi họ đổi thì rất khó lấy lại.
+
+=== Lịch chăm sóc theo tần suất ===
+Khách hàng A (BV lớn, đơn thường xuyên):
+• Gặp trực tiếp: 1 lần/tháng
+• Gọi điện kiểm tra hàng: 2 lần/tháng
+• Tin nhắn/Zalo: khi có sản phẩm mới hoặc khuyến mãi
+
+Khách hàng B (PK/NT, đơn vừa):
+• Gọi điện: 2 tuần/lần
+• Gặp mặt: 2 tháng/lần
+
+[tip]Ghi chú vào CRM: sinh nhật DS, ngày kỷ niệm bệnh viện, ngày họp hội đồng... gọi chúc đúng dịp = cực kỳ ấn tượng[/tip]
+
+=== 5 điều tạo ra khách hàng trung thành ===
+• Giao đúng hẹn mọi lần (đây là số 1)
+• Giải quyết vấn đề nhanh và không chối trách nhiệm
+• Chủ động báo khi có sản phẩm mới phù hợp
+• Nhớ tên, nhớ nhu cầu, nhớ lần trước đã nói gì
+• Không chỉ liên hệ khi cần bán — thỉnh thoảng hỏi thăm không có mục đích gì
+
+[warn]Đừng biến mất sau khi đã bán được đơn lớn. Khách hàng sẽ cảm thấy bị "dùng xong bỏ"[/warn]
+
+=== Script chăm sóc sau bán hàng ===
+[script]
+"Anh/chị ơi, em [Tên] từ Anh Sáng Y Tế. Đơn hàng tuần trước bên em giao có đủ và đúng chất lượng không ạ? Nếu có gì chưa ổn em xin lỗi và xử lý ngay. Bên mình có cần thêm gì không ạ?"
+[/script]`},
+    {id:'lib4',title:'Phân loại và ưu tiên khách hàng theo mức độ tiềm năng',cat:'ky-nang',difficulty:'trung-cap',readTime:6,author:'Ban Kinh Doanh',tags:['phân loại','ABC','pipeline'],pinned:false,views:0,createdAt:'2025-02-15',content:`=== Tại sao cần phân loại khách hàng? ===
+Mỗi nhân viên sales chỉ có 8 tiếng/ngày. Nếu dành đều nhau cho tất cả KH = lãng phí. Cần ưu tiên đúng để tối đa doanh thu.
+
+=== Hệ thống phân loại A-B-C ===
+
+[tip]Nhóm A — Khách hàng vàng (top 20% doanh thu): Đơn hàng ≥ 50 triệu/tháng, thanh toán đúng hạn → Gặp mặt 1 lần/tháng[/tip]
+
+[tip]Nhóm B — Khách hàng ổn định (15-50 triệu/tháng): Tiềm năng nâng lên nhóm A → Gọi điện 2 tuần/lần[/tip]
+
+[tip]Nhóm C — Khách hàng nhỏ (<15 triệu/tháng hoặc mới): Cần thời gian phát triển → Email/Zalo 1 tháng/lần[/tip]
+
+=== Checklist review pipeline hàng tuần ===
+• KH nhóm A có đơn trong 2 tuần qua không?
+• KH nhóm B nào chưa mua > 1 tháng → cần gọi thăm hỏi?
+• KH mới (C) nào có tín hiệu muốn mua? → tăng cường chăm sóc
+
+[warn]Xem lại phân loại mỗi quý — KH nhóm B tốt cần được nâng lên A và chăm sóc nhiều hơn[/warn]`},
+    {id:'lib5',title:'7 kỹ thuật chốt đơn hiệu quả trong y tế',cat:'chot-don',difficulty:'trung-cap',readTime:10,author:'Ban Kinh Doanh',tags:['chốt đơn','closing','kỹ thuật'],pinned:true,views:0,createdAt:'2025-03-01',content:`=== Chốt đơn không phải là ép mua ===
+Chốt đơn là giúp khách hàng đưa ra quyết định đúng đắn khi họ đã sẵn sàng.
+
+=== 1. Chốt bằng câu hỏi lựa chọn ===
+Thay vì hỏi "Có mua không?" → hỏi "Anh/chị muốn giao Thứ 3 hay Thứ 5 ạ?"
+
+[script]"Anh/chị cần số lượng 50 hộp hay 100 hộp để được giá tốt hơn?"[/script]
+
+=== 2. Chốt bằng khan hiếm ===
+[script]"Sản phẩm này đang có khuyến mãi đến hết tháng — sau đó giá sẽ tăng khoảng 8-10%. Anh/chị muốn em đặt hàng ngay không?"[/script]
+
+=== 3. Chốt bằng bản tóm tắt lợi ích ===
+[script]"Vậy tóm lại, bên em cung cấp: giao trong 24h, giá tốt hơn 5%, và có chính sách đổi hàng lỗi trong 30 ngày. Anh/chị có muốn thử đơn đầu tiên không?"[/script]
+
+=== 4. Chốt bằng thử nghiệm ===
+[script]"Nếu bên em đồng ý giao thử 20 hộp tuần này, anh/chị có thể đánh giá chất lượng và quyết định đơn tiếp theo. Anh/chị nghĩ thế nào?"[/script]
+
+=== 5. Chốt bằng câu hỏi giả định ===
+[script]"Giả sử giá và chất lượng đều OK, bên mình sẽ bắt đầu mua từ bao giờ?"[/script]
+
+=== 6. Chốt im lặng ===
+Sau khi đề xuất giá cuối → IM LẶNG, chờ đợi. Người nói trước thường nhượng bộ. Đừng phá vỡ im lặng bằng cách giảm giá thêm.
+
+=== 7. Chốt bằng ưu đãi nhỏ cuối cùng ===
+[script]"Nếu anh/chị quyết định hôm nay, em xin phép tặng thêm 5 hộp khẩu trang y tế kèm theo đơn ạ."[/script]
+
+[warn]Đừng dùng quá 2 kỹ thuật chốt trong một cuộc gặp — nghe có vẻ đang ép mua và gây phản cảm[/warn]`},
+    {id:'lib6',title:'Xử lý từ chối: "Để tôi suy nghĩ thêm"',cat:'chot-don',difficulty:'trung-cap',readTime:6,author:'Ban Kinh Doanh',tags:['từ chối','objection','suy nghĩ'],pinned:false,views:0,createdAt:'2025-03-10',content:`=== "Để tôi suy nghĩ thêm" thực ra có nghĩa gì? ===
+Đây thường không phải là "không" — mà là:
+• Tôi chưa đủ thông tin để quyết định
+• Tôi chưa thấy lý do đủ thuyết phục
+• Tôi có lo ngại nhưng chưa dám nói thẳng
+
+=== Cách xử lý đúng ===
+[script]
+"Anh/chị nói để suy nghĩ thêm, em hoàn toàn tôn trọng. Để em hỗ trợ tốt hơn, anh/chị có thể cho em biết điểm nào còn băn khoăn không ạ? Giá? Chất lượng? Hay thời gian giao hàng?"
+[/script]
+
+Sau khi họ nói ra lo ngại thực sự → mới giải quyết được.
+
+=== Nếu họ thực sự cần thời gian ===
+[script]
+"Không vấn đề ạ. Anh/chị có thể suy nghĩ đến thứ 3 không ạ? Em sẽ gọi lại vào sáng thứ 3 để hỗ trợ thêm thông tin nếu cần."
+[/script]
+
+[tip]Luôn đặt lịch follow-up cụ thể trước khi kết thúc cuộc gặp/gọi — không để kết thúc mà không có bước tiếp theo[/tip]
+
+[warn]Đừng gọi lại hỏi "Anh/chị nghĩ sao rồi?" — thay bằng "Em gọi để chia sẻ thêm thông tin về chính sách bảo hành mà anh/chị quan tâm hôm trước"[/warn]`},
+    {id:'lib7',title:'Chiến thuật báo giá và đàm phán giá thắng lợi',cat:'chot-don',difficulty:'nang-cao',readTime:9,author:'Giám đốc Kinh Doanh',tags:['giá','đàm phán','báo giá'],pinned:false,views:0,createdAt:'2025-03-20',content:`=== Nguyên tắc vàng: Đừng bao giờ báo giá ngay lập tức ===
+Khách hỏi giá mà bạn trả lời ngay = mất lợi thế đàm phán. Hãy hỏi thêm thông tin trước.
+
+=== Quy trình báo giá chuyên nghiệp ===
+• Tìm hiểu nhu cầu → số lượng, tần suất, yêu cầu chất lượng
+• Tìm hiểu ngân sách: "Hiện tại bên mình đang mua với mức giá khoảng bao nhiêu?"
+• Báo giá với phạm vi: "Tùy số lượng, giá dao động từ X đến Y"
+• Gửi báo giá chính thức trong 24h
+
+=== Khi khách yêu cầu giảm giá ===
+[script]
+"Anh/chị ơi, giá hiện tại là mức tốt nhất em có thể báo. Nếu anh/chị tăng số lượng lên 100 hộp, em có thể xin thêm chiết khấu 2% từ sếp. Anh/chị tính thử được không ạ?"
+[/script]
+
+=== Kỹ thuật neo giá (anchoring) ===
+Luôn báo giá cao hơn mục tiêu 10-15% → tạo không gian để giảm khi cần mà không mất lợi nhuận.
+
+[tip]Khi bị so sánh giá với đối thủ: "Giá của bên A có thể thấp hơn, nhưng bên em cam kết giao trong 24h và đổi trả trong 30 ngày — giá trị của sự yên tâm đó là bao nhiêu với anh/chị?"[/tip]
+
+[warn]Không bao giờ giảm giá mà không kèm theo điều kiện: tăng số lượng, thanh toán nhanh hơn, hoặc ký hợp đồng dài hạn[/warn]`},
+    {id:'lib8',title:'Khách nói "Giá cao hơn chỗ khác" — xử lý thế nào?',cat:'tinh-huong',difficulty:'co-ban',readTime:5,author:'Ban Kinh Doanh',tags:['giá cao','cạnh tranh','phản đối'],pinned:true,views:0,createdAt:'2025-04-01',content:`=== Đây là phản đối phổ biến nhất trong y tế ===
+Đừng hoảng loạn và giảm giá ngay — đó là sai lầm lớn nhất.
+
+=== Bước 1: Xác nhận và khen ngợi ===
+[script]"Cảm ơn anh/chị đã so sánh và chia sẻ thẳng thắn. Việc tìm được giá tốt nhất là điều hoàn toàn hợp lý."[/script]
+
+=== Bước 2: Hỏi để hiểu rõ ===
+[script]"Anh/chị có thể cho em biết bên kia báo giá sản phẩm tương tự là bao nhiêu không? Và thương hiệu/xuất xứ có giống nhau không ạ?"[/script]
+
+=== Bước 3: Giải thích giá trị (không phải giải thích giá) ===
+[script]"Giá của bên em cao hơn 5% nhưng bên em cam kết: (1) Giao hàng trong 24h, (2) CO-CQ đầy đủ, (3) Đổi trả hàng lỗi trong 30 ngày không cần giải thích. Giá trị đó với quy trình vận hành của cơ sở mình có đáng không anh/chị?"[/script]
+
+=== Bước 4: Nếu vẫn cần điều chỉnh ===
+[script]"Anh/chị đặt số lượng từ 50 hộp trở lên, em có thể chiết khấu thêm 3% ạ."[/script]
+
+[warn]Không bao giờ nói xấu đối thủ cạnh tranh — dù họ thực sự kém hơn. Khách hàng sẽ mất tin tưởng vào bạn[/warn]
+
+[tip]Sau khi bán được đơn đầu: giao đúng hẹn, chất lượng tốt → khách sẽ tự bỏ chỗ kia về với bạn[/tip]`},
+    {id:'lib9',title:'Khách không trả lời điện thoại / Zalo — phải làm gì?',cat:'tinh-huong',difficulty:'co-ban',readTime:4,author:'Ban Kinh Doanh',tags:['follow-up','không nghe máy','ghost'],pinned:false,views:0,createdAt:'2025-04-10',content:`=== Thực tế: 60% khách không nghe máy lần đầu ===
+Điều này bình thường — đừng nản. Có chiến lược tiếp cận đúng sẽ qua được.
+
+=== Quy trình 5 lần tiếp cận đa kênh ===
+
+Ngày 1: Gọi điện → Không nghe → Nhắn Zalo ngay sau đó
+[script]"Chào anh/chị, em [Tên] từ Anh Sáng Y Tế vừa gọi điện không liên lạc được. Khi nào anh/chị rảnh em xin gọi lại ạ 🙏"[/script]
+
+Ngày 3: Gọi lại → Nếu không nghe → Gửi email với catalog đính kèm
+
+Ngày 5: Nhắn Zalo lần 2 kèm thông tin có giá trị
+[script]"Anh/chị ơi, tuần này bên em vừa nhận thêm hàng Kit HBsAg mới. Em gửi bảng giá mới nhất để anh/chị tham khảo ạ."[/script]
+
+Ngày 7: Gọi vào khung giờ khác (thử sáng sớm 7:30-8:00 hoặc chiều 17:00-17:30)
+
+Ngày 10: Tin nhắn cuối — trao quyền quyết định
+[script]"Anh/chị ơi, em đã liên hệ vài lần nhưng không tiện. Nếu anh/chị chưa có nhu cầu vật tư y tế tại thời điểm này, em hoàn toàn thông cảm. Khi nào cần em sẽ ở đây hỗ trợ ạ."[/script]
+
+[tip]Khung giờ vàng để gọi cho DS/BS: 8:00-9:00 sáng hoặc 12:00-13:00 (giờ nghỉ trưa)[/tip]
+
+[warn]Không gọi quá 2 lần trong 1 ngày — sẽ bị coi là phiền nhiễu và block số[/warn]`},
+    {id:'lib10',title:'Xử lý tình huống hàng bị lỗi / giao sai / thiếu hàng',cat:'tinh-huong',difficulty:'trung-cap',readTime:6,author:'Ban Kinh Doanh',tags:['khiếu nại','hàng lỗi','xử lý sự cố'],pinned:false,views:0,createdAt:'2025-04-15',content:`=== Nguyên tắc số 1: Khách phàn nàn = họ vẫn muốn tiếp tục làm việc với bạn ===
+Khi khách im lặng và không mua nữa — đó mới là nguy hiểm thực sự.
+
+=== Bước 1: Lắng nghe và xin lỗi (không giải thích) ===
+[script]"Anh/chị ơi, em rất tiếc về sự cố này. Em hiểu điều này ảnh hưởng đến hoạt động của cơ sở. Em xin lỗi anh/chị."[/script]
+
+[warn]KHÔNG bao giờ giải thích ngay (dù lỗi do bưu điện, do kho...) — khách không cần biết lý do, họ cần giải pháp[/warn]
+
+=== Bước 2: Đề xuất giải pháp ngay lập tức ===
+[script]"Em sẽ xử lý ngay hôm nay ạ. Bên em sẽ: (1) Giao bổ sung/đổi hàng đúng trong ngày hôm nay, (2) Không tính phí vận chuyển cho đơn đổi này. Anh/chị có thể cho em địa chỉ giao lại không ạ?"[/script]
+
+=== Bước 3: Theo dõi đến khi giải quyết xong ===
+• Gọi lại sau khi giao hàng đổi/bổ sung: "Anh/chị đã nhận được và ổn chưa ạ?"
+• Ghi vào CRM để theo dõi và tránh lặp lại
+
+[tip]Sau khi giải quyết ổn, gọi hỏi thăm 1 tuần sau → tạo ấn tượng cực tốt[/tip]`},
+    {id:'lib11',title:'Tình huống khách đang dùng hàng của đối thủ cạnh tranh',cat:'tinh-huong',difficulty:'nang-cao',readTime:7,author:'Giám đốc Kinh Doanh',tags:['đối thủ','chuyển đổi','chiến lược'],pinned:false,views:0,createdAt:'2025-05-01',content:`=== Thực tế: 70% khách tiềm năng đang mua hàng của đối thủ ===
+Mục tiêu không phải là thuyết phục họ bỏ ngay — mà là chen chân vào và chứng minh giá trị.
+
+=== Chiến lược "Foot in the door" (Đặt chân vào cửa) ===
+
+=== Bước 1: Không tấn công thẳng vào đối thủ ===
+[script]"Em biết cơ sở đang có nhà cung cấp quen rồi. Em không đề nghị thay thế ngay, chỉ xin cơ hội cung cấp 1-2 sản phẩm mà bên đó đang thiếu hàng hoặc giá chưa cạnh tranh."[/script]
+
+=== Bước 2: Tìm "khe hở" của đối thủ ===
+Hỏi khéo: "Có sản phẩm nào cơ sở hay bị thiếu hàng hoặc phải chờ lâu không?"
+→ Đó là cơ hội của bạn.
+
+=== Bước 3: Thắng đơn đầu bằng tốc độ và dịch vụ ===
+Đơn đầu tiên: giao nhanh nhất có thể, hàng chất lượng, theo dõi sát sao.
+
+=== Bước 4: Mở rộng dần ===
+Sau 2-3 đơn thành công → hỏi: "Bên em có thể cung cấp thêm [sản phẩm X] với giá tốt hơn — anh/chị muốn so sánh không?"
+
+[tip]Hỏi về sản phẩm đối thủ đang thiếu hàng thường xuyên — đó là điểm yếu của họ và điểm mạnh của bạn[/tip]
+
+[warn]Kiên nhẫn — chuyển đổi khách từ đối thủ mất 3-6 tháng. Không có shortcut[/warn]`},
+    {id:'lib12',title:'Quy trình giao hàng chuẩn — đúng lịch, đúng hàng',cat:'giao-hang',difficulty:'co-ban',readTime:5,author:'Bộ phận Kho vận',tags:['giao hàng','kho','quy trình'],pinned:false,views:0,createdAt:'2025-04-20',content:`=== Tại sao giao hàng quan trọng như bán hàng? ===
+Khách hàng nhớ lần giao hàng trễ hơn 10 lần bán hàng giỏi. Giao hàng = cam kết cuối cùng.
+
+=== Quy trình chuẩn trước khi giao ===
+• Kiểm tra kho trước khi xác nhận ngày giao với khách
+• In phiếu giao hàng với đầy đủ: tên sản phẩm, số lô, hạn SD, số lượng
+• Đóng gói đúng tiêu chuẩn (hàng dễ vỡ có lót xốp)
+• Chụp ảnh hàng trước khi giao (bằng chứng khi có tranh chấp)
+
+=== Quy trình khi giao hàng ===
+• Đến đúng giờ đã hẹn (±30 phút)
+• Mang phiếu giao hàng 2 bản để ký nhận
+• Kiểm tra hàng cùng khách trước khi ký
+
+=== Tình huống giao trễ ===
+[script]"Anh/chị ơi, em gọi để báo đơn hàng hôm nay em giao trễ khoảng 2 tiếng do [lý do]. Em xin lỗi anh/chị về sự bất tiện này. Anh/chị vẫn nhận được trong ngày hôm nay chứ ạ?"[/script]
+
+[warn]KHÔNG để khách tự phát hiện hàng trễ — luôn chủ động báo trước ít nhất 2 tiếng[/warn]
+
+[tip]Giao hàng đúng hẹn 10/10 lần = khách nhắc đến công ty như nhà cung cấp uy tín nhất[/tip]`},
+    {id:'lib13',title:'Xử lý tình huống giao hàng bị từ chối tại cổng BV',cat:'giao-hang',difficulty:'trung-cap',readTime:4,author:'Bộ phận Kho vận',tags:['giao hàng','bệnh viện','cổng'],pinned:false,views:0,createdAt:'2025-04-25',content:`=== Thực tế BV: Nhiều thủ tục tiếp nhận hàng phức tạp ===
+Bảo vệ, quy định giờ nhập hàng, cần đặt lịch trước... Đây là điều cần biết trước.
+
+=== Chuẩn bị trước khi đến BV ===
+• Hỏi người liên hệ: "Bên mình nhận hàng ở cổng nào? Giờ nào?"
+• Chuẩn bị: Phiếu giao hàng, Hóa đơn (nếu yêu cầu), CO-CQ nếu BV đấu thầu
+• Gọi báo trước 30 phút: "Em sắp đến giao hàng ạ, cho em biết phải vào cổng nào?"
+
+=== Tình huống bảo vệ không cho vào ===
+[script]"Anh ơi, em giao hàng cho bộ phận Dược/Kho vật tư. Người liên hệ là anh/chị [Tên] — số điện thoại [SĐT]. Anh có thể giúp em liên lạc với anh/chị đó không ạ?"[/script]
+
+=== Tình huống kho không có người nhận ===
+• Gọi ngay cho người liên hệ báo tình huống
+• Không bỏ hàng mà không có chữ ký xác nhận
+• Nếu cần về → đặt lịch giao lại cụ thể
+
+[warn]Không để hàng tại cổng bệnh viện mà không có người ký nhận — dù khách có nói "để đó cho anh"[/warn]`},
+    {id:'lib14',title:'Cách nhắc nợ chuyên nghiệp không làm mất khách',cat:'thanh-toan',difficulty:'trung-cap',readTime:7,author:'Bộ phận Kế toán',tags:['nhắc nợ','công nợ','thanh toán'],pinned:true,views:0,createdAt:'2025-05-01',content:`=== Nguyên tắc: Nhắc nợ = dịch vụ, không phải đòi tiền ===
+Cách bạn nhắc nợ sẽ quyết định khách có mua tiếp hay không.
+
+=== Phân loại theo số ngày quá hạn ===
+
+=== 1-15 ngày quá hạn: Nhắc nhẹ qua Zalo/SMS ===
+[script]"Chào anh/chị [Tên], bên em có khoản thanh toán đơn DH-XXX đến hạn ngày [ngày] trị giá [số tiền]. Anh/chị kiểm tra và sắp xếp thanh toán giúp em nhé. Nếu cần hỗ trợ thêm thông tin em sẵn sàng ạ 🙏"[/script]
+
+=== 15-30 ngày quá hạn: Gọi điện trực tiếp ===
+[script]"Anh/chị [Tên] ơi, em [Tên] từ Anh Sáng Y Tế gọi về đơn hàng DH-XXX. Hiện tại đã quá hạn [X] ngày rồi ạ. Anh/chị đang gặp khó khăn gì không? Bên em có thể hỗ trợ chia 2 lần thanh toán nếu cần."[/script]
+
+=== 30-45 ngày quá hạn: Thư chính thức + gặp mặt ===
+[script]"Anh/chị, đây là thông báo chính thức về khoản công nợ [số tiền] đã quá hạn [X] ngày. Bên em cần thanh toán trước ngày [ngày] để tiếp tục phục vụ."[/script]
+
+=== >45 ngày: Leo thang lên cấp trên ===
+• Báo cáo giám đốc kinh doanh
+• Xem xét tạm dừng giao hàng mới
+
+[tip]Sau khi khách thanh toán: cảm ơn ngay và hỏi xem có nhu cầu đơn mới không — biến tình huống xấu thành cơ hội[/tip]
+
+[warn]Đừng nhắc nợ trước mặt người khác tại cơ sở — làm họ mất mặt sẽ không mua nữa[/warn]`},
+    {id:'lib15',title:'Đàm phán điều khoản thanh toán khi ký hợp đồng',cat:'thanh-toan',difficulty:'nang-cao',readTime:8,author:'Giám đốc Kinh Doanh',tags:['hợp đồng','điều khoản','thanh toán'],pinned:false,views:0,createdAt:'2025-05-10',content:`=== Điều khoản thanh toán ảnh hưởng trực tiếp đến dòng tiền ===
+Một hợp đồng tốt không chỉ về giá — mà còn về thời hạn thanh toán, hình thức và điều kiện.
+
+=== Các điều khoản thanh toán phổ biến ===
+• Net 15: Thanh toán trong 15 ngày sau khi nhận hàng
+• Net 30: Thanh toán trong 30 ngày (phổ biến với BV/PK)
+• COD: Thanh toán ngay khi giao hàng (tốt nhất cho công ty)
+• Đặt cọc 30% + 70% khi giao: tốt cho đơn lớn
+
+=== Chiến thuật đàm phán điều khoản ===
+[script]"Chính sách công ty em là Net 30 ạ. Nhưng nếu anh/chị có thể thanh toán trong 15 ngày, em có thể tăng chiết khấu thêm 1% — tiết kiệm cho cơ sở khoảng [X triệu] mỗi năm."[/script]
+
+=== Với BV lớn (thường yêu cầu Net 60-90) ===
+[script]"Bên em hiểu BV có chu kỳ tài chính dài. Em có thể đồng ý Net 45 nhưng cần anh/chị ký xác nhận đơn hàng chính thức trước khi giao. Anh/chị thấy OK không ạ?"[/script]
+
+=== Điều khoản bảo vệ công ty ===
+• Ghi rõ % lãi phạt nếu thanh toán trễ (thường 0.5-1%/tháng)
+• Điều khoản tạm dừng cung cấp nếu nợ quá X ngày
+• Yêu cầu đặt cọc cho đơn hàng lần đầu
+
+[tip]Luôn ký hợp đồng hoặc có xác nhận đơn hàng bằng email/Zalo — tránh tranh chấp "không nhớ đã nói" sau này[/tip]
+
+[warn]Khách hàng BV công thường yêu cầu hóa đơn trước khi thanh toán — đảm bảo xuất hóa đơn đúng hạn sau khi giao[/warn]`},
+  ];
+}
+
+let libCat='all',libSearch='',libEditId=null;
+
+function parseLibContent(raw){
+  if(!raw)return'';
+  let html=raw
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/\[script\]([\s\S]*?)\[\/script\]/g,(_,c)=>`<div class="script-box">${c.trim().replace(/\n/g,'<br>')}</div>`)
+    .replace(/\[tip\]([\s\S]*?)\[\/tip\]/g,(_,c)=>`<div class="tip-box">${c.trim().replace(/\n/g,'<br>')}</div>`)
+    .replace(/\[warn\]([\s\S]*?)\[\/warn\]/g,(_,c)=>`<div class="warn-box">${c.trim().replace(/\n/g,'<br>')}</div>`)
+    .replace(/=== (.+?) ===/g,'<h3>$1</h3>')
+    .replace(/\n• (.+)/g,'<li>$1</li>')
+    .replace(/\n✅ (.+)/g,'<li>✅ $1</li>')
+    .replace(/(<li>[\s\S]+?<\/li>)/g,m=>`<ul>${m}</ul>`)
+    .replace(/<\/ul>\s*<ul>/g,'')
+    .replace(/\n\n/g,'</p><p>')
+    .replace(/\n/g,'<br>');
+  return '<p>'+html+'</p>';
+}
+
+function libCatColor(cat){
+  const m={'ky-nang':'#F97316','chot-don':'#10B981','tinh-huong':'#3B82F6','giao-hang':'#F59E0B','thanh-toan':'#EF4444','san-pham':'#8B5CF6'};
+  return m[cat]||'#6B7280';
+}
+function libCatLabel(cat){
+  const m={'ky-nang':'🎯 Kỹ năng','chot-don':'✅ Chốt đơn','tinh-huong':'💬 Tình huống','giao-hang':'🚚 Giao hàng','thanh-toan':'💰 Thanh toán','san-pham':'💊 Sản phẩm'};
+  return m[cat]||cat;
+}
+function diffLabel(d){
+  const m={'co-ban':'🟢 Cơ bản','trung-cap':'🟡 Trung cấp','nang-cao':'🔴 Nâng cao'};
+  return m[d]||d;
+}
+
+function rLibrary(){
+  document.getElementById('pg-actions').innerHTML=`<button class="btn btn-primary" onclick="openLibM()">➕ Thêm bài học</button>`;
+  const cats=[
+    {v:'all',l:'📖 Tất cả'},{v:'ky-nang',l:'🎯 Kỹ năng'},{v:'chot-don',l:'✅ Chốt đơn'},
+    {v:'tinh-huong',l:'💬 Tình huống'},{v:'giao-hang',l:'🚚 Giao hàng'},{v:'thanh-toan',l:'💰 Thanh toán'},{v:'san-pham',l:'💊 Sản phẩm'},
+  ];
+  const catTabs=cats.map(c=>`<button class="cat-tab${libCat===c.v?' active':''}" onclick="setLibCat('${c.v}')">${c.l}</button>`).join('');
+  let items=DB.library.slice();
+  if(libCat!=='all')items=items.filter(l=>l.cat===libCat);
+  if(libSearch)items=items.filter(l=>(l.title+l.content+(l.tags||[]).join('')).toLowerCase().includes(libSearch.toLowerCase()));
+  items.sort((a,b)=>(b.pinned?1:0)-(a.pinned?1:0));
+  const cards=items.map(l=>`
+    <div class="lib-card${l.pinned?' pinned':''}" onclick="viewLib('${l.id}')">
+      <div class="lib-cat-bar" style="background:${libCatColor(l.cat)}"></div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
+        <span style="background:${libCatColor(l.cat)}20;color:${libCatColor(l.cat)};font-size:10px;font-weight:700;padding:2px 8px;border-radius:12px">${libCatLabel(l.cat)}</span>
+        <span class="diff-badge diff-${l.difficulty}">${diffLabel(l.difficulty)}</span>
+      </div>
+      <div class="lib-title">${esc(l.title)}</div>
+      <div class="lib-excerpt">${l.content.replace(/\[.*?\]/g,'').replace(/=== .+? ===/g,'').replace(/\n/g,' ').trim().slice(0,120)}...</div>
+      <div class="lib-meta">
+        <span>✍️ ${esc(l.author||'Ẩn danh')}</span>
+        <span>⏱ ${l.readTime||5} phút</span>
+        <span>👁 ${l.views||0} lượt</span>
+        ${(l.tags||[]).slice(0,2).map(t=>`<span style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:1px 7px">${esc(t)}</span>`).join('')}
+      </div>
+    </div>`).join('')||`<div style="grid-column:1/-1;text-align:center;padding:48px 24px;color:var(--muted)"><div style="font-size:48px;margin-bottom:12px">📚</div><div style="font-size:16px;font-weight:600">Chưa có bài học nào</div><p style="margin-top:8px">Nhấn "Thêm bài học" để bắt đầu xây dựng thư viện!</p></div>`;
+  document.getElementById('library').innerHTML=`
+    <div style="margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
+      <div>
+        <span style="font-size:20px;font-weight:700">📚 Thư viện kiến thức</span>
+        <span style="margin-left:12px;font-size:13px;color:var(--muted)">${DB.library.length} bài học · ${DB.library.filter(l=>l.pinned).length} bài ghim</span>
+      </div>
+    </div>
+    <div style="margin-bottom:14px">
+      <div class="search-wrap" style="max-width:400px;display:inline-block">
+        <span class="search-ico">🔍</span>
+        <input placeholder="Tìm kiếm bài học, tình huống, kỹ năng..." value="${esc(libSearch)}" oninput="libSearchFn(this.value)">
+      </div>
+    </div>
+    <div class="cat-tabs">${catTabs}</div>
+    <div class="lib-grid">${cards}</div>`;
+}
+
+function setLibCat(c){libCat=c;rLibrary();}
+function libSearchFn(v){libSearch=v;rLibrary();}
+
+function viewLib(id){
+  const l=DB.library.find(x=>x.id===id);if(!l)return;
+  l.views=(l.views||0)+1;
+  document.getElementById('mlibv-ttl').textContent=l.title;
+  document.getElementById('mlibv-meta').innerHTML=`
+    <span style="background:${libCatColor(l.cat)}20;color:${libCatColor(l.cat)};font-size:10px;font-weight:700;padding:2px 8px;border-radius:12px">${libCatLabel(l.cat)}</span>
+    <span class="diff-badge diff-${l.difficulty}" style="margin-left:6px">${diffLabel(l.difficulty)}</span>
+    <span style="margin-left:10px">✍️ ${esc(l.author||'Ẩn danh')} · ⏱ ${l.readTime||5} phút · 👁 ${l.views} lượt đọc</span>
+    ${(l.tags||[]).map(t=>`<span style="margin-left:4px;background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:1px 7px;font-size:11px">${esc(t)}</span>`).join('')}`;
+  document.getElementById('mlibv-body').innerHTML=parseLibContent(l.content);
+  document.getElementById('mlibv-edit-btn').onclick=()=>{closeM('m-libview');openLibM(id);};
+  openM('m-libview');
+}
+
+function openLibM(id=null){
+  libEditId=id;
+  document.getElementById('mlib-ttl').textContent=id?'✏️ Sửa bài học':'➕ Thêm bài học mới';
+  if(id){
+    const l=DB.library.find(x=>x.id===id);if(!l)return;
+    document.getElementById('mlib-title').value=l.title;
+    document.getElementById('mlib-cat').value=l.cat;
+    document.getElementById('mlib-diff').value=l.difficulty;
+    document.getElementById('mlib-time').value=l.readTime||5;
+    document.getElementById('mlib-author').value=l.author||'';
+    document.getElementById('mlib-tags').value=(l.tags||[]).join(', ');
+    document.getElementById('mlib-content').value=l.content;
+    document.getElementById('mlib-pinned').checked=!!l.pinned;
+  }else{
+    document.getElementById('mlib-title').value='';
+    document.getElementById('mlib-cat').value='ky-nang';
+    document.getElementById('mlib-diff').value='co-ban';
+    document.getElementById('mlib-time').value='5';
+    document.getElementById('mlib-author').value='';
+    document.getElementById('mlib-tags').value='';
+    document.getElementById('mlib-content').value='';
+    document.getElementById('mlib-pinned').checked=false;
+  }
+  openM('m-lib');
+}
+
+function saveLib(){
+  const title=document.getElementById('mlib-title').value.trim();
+  const content=document.getElementById('mlib-content').value.trim();
+  if(!title){toast('Vui lòng nhập tiêu đề','error');return;}
+  if(!content){toast('Vui lòng nhập nội dung','error');return;}
+  const tags=document.getElementById('mlib-tags').value.split(',').map(t=>t.trim()).filter(Boolean);
+  if(libEditId){
+    const l=DB.library.find(x=>x.id===libEditId);
+    if(l){
+      l.title=title;l.cat=document.getElementById('mlib-cat').value;
+      l.difficulty=document.getElementById('mlib-diff').value;
+      l.readTime=parseInt(document.getElementById('mlib-time').value)||5;
+      l.author=document.getElementById('mlib-author').value.trim();
+      l.tags=tags;l.content=content;
+      l.pinned=document.getElementById('mlib-pinned').checked;
+    }
+  }else{
+    DB.library.push({
+      id:'lib'+Date.now(),title,
+      cat:document.getElementById('mlib-cat').value,
+      difficulty:document.getElementById('mlib-diff').value,
+      readTime:parseInt(document.getElementById('mlib-time').value)||5,
+      author:document.getElementById('mlib-author').value.trim(),
+      tags,content,
+      pinned:document.getElementById('mlib-pinned').checked,
+      views:0,createdAt:td()
+    });
+  }
+  save();closeM('m-lib');toast(libEditId?'Đã cập nhật bài học ✅':'Đã thêm bài học mới ✅');rLibrary();
+}
+
+function delLib(id){
+  cfm('Xóa bài học','Xóa bài học này khỏi thư viện?',()=>{
+    DB.library=DB.library.filter(x=>x.id!==id);
+    save();toast('Đã xóa','info');closeM('m-libview');rLibrary();
   });
 }
 
